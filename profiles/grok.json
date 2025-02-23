@@ -1,7 +1,7 @@
 {
-    "name": "Grok",
+  "name": "Grok",
 
-    "model": "grok-beta",
-    
-    "embedding": "openai"
+  "model": "grok-beta",
+
+  "embedding": "openai"
 }

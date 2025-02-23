@@ -15,11 +15,11 @@ export default [
       sourceType: "module",
     },
     rules: {
-      "no-undef": "error",              // Disallow the use of undeclared variables or functions.
-      "semi": ["error", "always"],      // Require the use of semicolons at the end of statements.
-      "curly": "warn",                  // Enforce the use of curly braces around blocks of code.
-      "no-unused-vars": "off",          // Disable warnings for unused variables.
-      "no-unreachable": "off",          // Disable warnings for unreachable code.
+      "no-undef": "error", // Disallow the use of undeclared variables or functions.
+      semi: ["error", "always"], // Require the use of semicolons at the end of statements.
+      curly: "warn", // Enforce the use of curly braces around blocks of code.
+      "no-unused-vars": "off", // Disable warnings for unused variables.
+      "no-unreachable": "off", // Disable warnings for unreachable code.
     },
   },
 ];
