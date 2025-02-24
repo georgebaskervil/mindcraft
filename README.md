@@ -51,7 +51,10 @@ You can configure the agent's name, model, and prompts in their profile like `an
 | `openrouter`     | `OPENROUTER_API_KEY`  | `openrouter/anthropic/claude-3.5-sonnet`           | [docs](https://openrouter.ai/models)                                                                                                                                        |
 
 If you use Ollama, to install the models used by default (generation and embedding), execute the following terminal command:
-`ollama pull llama3 && ollama pull nomic-embed-text`
+
+```bash
+ollama pull llama3 && ollama pull nomic-embed-text
+```
 
 ### Online Servers
 
@@ -125,7 +128,6 @@ You can pass a string or an object for these fields. A model object must specify
   "url": "https://api.openai.com/v1/",
   "model": "text-embedding-ada-002"
 }
-
 ```
 
 `model` is used for chat, `code_model` is used for newAction coding, and `embedding` is used to embed text for example selection. If `code_model` or `embedding` are not specified, they will use `model` by default. Not all APIs have an embedding model.
@@ -157,8 +159,4 @@ Some of the node modules that we depend on have bugs in them. To add a patch, ch
     Year = {2023},
     url={https://github.com/kolbytn/mindcraft}
 }
-```
-
-```
-
 ```

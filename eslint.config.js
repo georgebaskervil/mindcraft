@@ -43,6 +43,8 @@ export default [
       curly: "warn",
       "no-unused-vars": "off",
       "no-unreachable": "off",
+      "unicorn/filename-case": "off",
+      "unicorn/no-null": "off",
     },
   },
 ];
