@@ -1,9 +1,9 @@
 import { strictFormat } from "../utils/text.js";
 
 export class Local {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
-    this.params = params;
+    this.params = parameters;
     this.url = url || "http://127.0.0.1:11434";
     this.chat_endpoint = "/api/chat";
     this.embedding_endpoint = "/api/embeddings";
@@ -20,14 +20,14 @@ export class Local {
         model: model,
         messages: messages,
         stream: false,
-        ...(this.params || {}),
+        ...this.params,
       });
       if (res) {
         res = res["message"]["content"];
       }
-    } catch (err) {
+    } catch (error) {
       if (
-        err.message.toLowerCase().includes("context length") &&
+        error.message.toLowerCase().includes("context length") &&
         turns.length > 1
       ) {
         console.log(
@@ -35,7 +35,7 @@ export class Local {
         );
         return await sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
-        console.log(err);
+        console.log(error);
         res = "My brain disconnected, try again.";
       }
     }
@@ -66,9 +66,9 @@ export class Local {
       } else {
         throw new Error(`Ollama Status: ${res.status}`);
       }
-    } catch (err) {
+    } catch (error) {
       console.error("Failed to send Ollama request.");
-      console.error(err);
+      console.error(error);
     }
     return data;
   }

@@ -4,10 +4,10 @@ import { strictFormat } from "../utils/text.js";
 
 // llama, mistral
 export class Novita {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name.replace("novita/", "");
     this.url = url || "https://api.novita.ai/v3/openai";
-    this.params = params;
+    this.params = parameters;
 
     let config = {
       baseURL: this.url,
@@ -26,7 +26,7 @@ export class Novita {
       model: this.model_name || "meta-llama/llama-3.1-70b-instruct",
       messages,
       stop: [stop_seq],
-      ...(this.params || {}),
+      ...this.params,
     };
 
     let res = null;
@@ -38,10 +38,10 @@ export class Novita {
       }
       console.log("Received.");
       res = completion.choices[0].message.content;
-    } catch (err) {
+    } catch (error) {
       if (
-        (err.message == "Context length exceeded" ||
-          err.code == "context_length_exceeded") &&
+        (error.message == "Context length exceeded" ||
+          error.code == "context_length_exceeded") &&
         turns.length > 1
       ) {
         console.log(
@@ -49,7 +49,7 @@ export class Novita {
         );
         return await sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
-        console.log(err);
+        console.log(error);
         res = "My brain disconnected, try again.";
       }
     }
@@ -57,11 +57,7 @@ export class Novita {
       let start = res.indexOf("<think>");
       let end = res.indexOf("</think>") + 8;
       if (start != -1) {
-        if (end != -1) {
-          res = res.substring(0, start) + res.substring(end);
-        } else {
-          res = res.substring(0, start + 7);
-        }
+        res = end == -1 ? res.slice(0, Math.max(0, start + 7)) : res.slice(0, Math.max(0, start)) + res.slice(Math.max(0, end));
       }
       res = res.trim();
     }

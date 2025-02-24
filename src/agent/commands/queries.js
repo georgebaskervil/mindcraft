@@ -3,8 +3,8 @@ import * as mc from "../../utils/mcdata.js";
 import { getCommandDocs } from "./index.js";
 import convoManager from "../conversation.js";
 
-const pad = (str) => {
-  return "\n" + str + "\n";
+const pad = (string_) => {
+  return "\n" + string_ + "\n";
 };
 
 // queries are commands that just return strings and don't affect anything in the world
@@ -32,7 +32,7 @@ export const queryList = [
       }
       res += `\n- Weather: ${weather}`;
       // let block = bot.blockAt(pos);
-      // res += `\n- Artficial light: ${block.skyLight}`;
+      // res += `\n- Artificial light: ${block.skyLight}`;
       // res += `\n- Sky light: ${block.light}`;
       // light properties are bugged, they are not accurate
       res += "\n- " + world.getSurroundingBlocks(bot).join("\n- ");
@@ -40,7 +40,7 @@ export const queryList = [
 
       if (bot.time.timeOfDay < 6000) {
         res += "\n- Time: Morning";
-      } else if (bot.time.timeOfDay < 12000) {
+      } else if (bot.time.timeOfDay < 12_000) {
         res += "\n- Time: Afternoon";
       } else {
         res += "\n- Time: Night";
@@ -118,10 +118,10 @@ export const queryList = [
       let bot = agent.bot;
       let res = "NEARBY_BLOCKS";
       let blocks = world.getNearbyBlockTypes(bot);
-      for (let i = 0; i < blocks.length; i++) {
-        res += `\n- ${blocks[i]}`;
+      for (const block of blocks) {
+        res += `\n- ${block}`;
       }
-      if (blocks.length == 0) {
+      if (blocks.length === 0) {
         res += ": none";
       } else {
         // Environmental Awareness
@@ -211,12 +211,12 @@ export const queryList = [
       let bot = agent.bot;
 
       // Fetch the bot's inventory
-      const curr_inventory = world.getInventoryCounts(bot);
+      const current_inventory = world.getInventoryCounts(bot);
       const target_item = targetItem;
-      let existingCount = curr_inventory[target_item] || 0;
+      let existingCount = current_inventory[target_item] || 0;
       let prefixMessage = "";
       if (existingCount > 0) {
-        curr_inventory[target_item] -= existingCount;
+        current_inventory[target_item] -= existingCount;
         prefixMessage = `You already have ${existingCount} ${target_item} in your inventory. If you need to craft more,\n`;
       }
 
@@ -224,7 +224,7 @@ export const queryList = [
       let craftingPlan = mc.getDetailedCraftingPlan(
         target_item,
         quantity,
-        curr_inventory,
+        current_inventory,
       );
       craftingPlan = prefixMessage + craftingPlan;
       console.log(craftingPlan);

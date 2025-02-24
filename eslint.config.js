@@ -1,25 +1,48 @@
-// eslint.config.js
+import unicorn from "eslint-plugin-unicorn";
 import globals from "globals";
-import pluginJs from "@eslint/js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import js from "@eslint/js";
+import { FlatCompat } from "@eslint/eslintrc";
 
-/** @type {import('eslint').Linter.Config[]} */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
+});
+
 export default [
-  // First, import the recommended configuration
-  pluginJs.configs.recommended,
-
-  // Then override or customize specific rules
   {
+    ignores: ["**/node_modules/"],
+  },
+  ...compat.extends(
+    "eslint:recommended",
+    "plugin:unicorn/recommended",
+    "prettier",
+  ),
+  {
+    plugins: {
+      unicorn,
+    },
+
     languageOptions: {
-      globals: globals.browser,
-      ecmaVersion: 2021,
+      globals: {
+        ...globals.node,
+      },
+
+      ecmaVersion: "latest",
       sourceType: "module",
     },
+
+    // Add rules section
     rules: {
-      "no-undef": "error", // Disallow the use of undeclared variables or functions.
-      semi: ["error", "always"], // Require the use of semicolons at the end of statements.
-      curly: "warn", // Enforce the use of curly braces around blocks of code.
-      "no-unused-vars": "off", // Disable warnings for unused variables.
-      "no-unreachable": "off", // Disable warnings for unreachable code.
+      "no-undef": "error",
+      semi: ["error", "always"],
+      curly: "warn",
+      "no-unused-vars": "off",
+      "no-unreachable": "off",
     },
   },
 ];

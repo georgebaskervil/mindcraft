@@ -60,11 +60,7 @@ class ItemNode {
 
   setCollectable(source = null, tool = null) {
     this.type = "block";
-    if (source) {
-      this.source = source;
-    } else {
-      this.source = this.name;
-    }
+    this.source = source ? source : this.name;
     if (tool) {
       if (this.manager.nodes[tool] === undefined) {
         this.manager.nodes[tool] = new ItemWrapper(
@@ -185,14 +181,18 @@ class ItemNode {
     }
     let inventory = world.getInventoryCounts(this.manager.agent.bot);
     let init_quantity = inventory[this.name] || 0;
-    if (this.type === "block") {
+    switch (this.type) {
+    case "block": {
       await skills.collectBlock(
         this.manager.agent.bot,
         this.source,
         quantity,
         this.manager.agent.npc.getBuiltPositions(),
       );
-    } else if (this.type === "smelt") {
+    
+    break;
+    }
+    case "smelt": {
       let to_smelt_name = this.recipe[0].node.name;
       let to_smelt_quantity = Math.min(quantity, inventory[to_smelt_name] || 1);
       await skills.smeltItem(
@@ -200,15 +200,25 @@ class ItemNode {
         to_smelt_name,
         to_smelt_quantity,
       );
-    } else if (this.type === "hunt") {
-      for (let i = 0; i < quantity; i++) {
+    
+    break;
+    }
+    case "hunt": {
+      for (let index = 0; index < quantity; index++) {
         res = await skills.attackNearest(this.manager.agent.bot, this.source);
         if (!res || this.manager.agent.bot.interrupt_code) {
           break;
         }
       }
-    } else if (this.type === "craft") {
+    
+    break;
+    }
+    case "craft": {
       await skills.craftRecipe(this.manager.agent.bot, this.name, quantity);
+    
+    break;
+    }
+    // No default
     }
     let final_quantity =
       world.getInventoryCounts(this.manager.agent.bot)[this.name] || 0;

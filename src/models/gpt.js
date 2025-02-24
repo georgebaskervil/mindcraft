@@ -3,9 +3,9 @@ import { getKey, hasKey } from "../utils/keys.js";
 import { strictFormat } from "../utils/text.js";
 
 export class GPT {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
-    this.params = params;
+    this.params = parameters;
 
     let config = {};
     if (url) {
@@ -28,7 +28,7 @@ export class GPT {
       model: this.model_name || "gpt-3.5-turbo",
       messages,
       stop: stop_seq,
-      ...(this.params || {}),
+      ...this.params,
     };
     if (this.model_name.includes("o1")) {
       pack.messages = strictFormat(messages);
@@ -46,10 +46,10 @@ export class GPT {
       }
       console.log("Received.");
       res = completion.choices[0].message.content;
-    } catch (err) {
+    } catch (error) {
       if (
-        (err.message == "Context length exceeded" ||
-          err.code == "context_length_exceeded") &&
+        (error.message == "Context length exceeded" ||
+          error.code == "context_length_exceeded") &&
         turns.length > 1
       ) {
         console.log(
@@ -57,7 +57,7 @@ export class GPT {
         );
         return await this.sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
-        console.log(err);
+        console.log(error);
         res = "My brain disconnected, try again.";
       }
     }

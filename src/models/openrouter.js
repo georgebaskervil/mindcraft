@@ -46,8 +46,8 @@ export class OpenRouter {
       }
       console.log("Received.");
       res = completion.choices[0].message.content;
-    } catch (err) {
-      console.error("Error while awaiting response:", err);
+    } catch (error) {
+      console.error("Error while awaiting response:", error);
       // If the error indicates a context-length problem, we can slice the turns array, etc.
       res = "My brain disconnected, try again.";
     }

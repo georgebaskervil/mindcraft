@@ -4,10 +4,10 @@ import { getKey } from "../utils/keys.js";
 
 // llama, mistral
 export class ReplicateAPI {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
     this.url = url;
-    this.params = params;
+    this.params = parameters;
 
     if (this.url) {
       console.warn(
@@ -28,7 +28,7 @@ export class ReplicateAPI {
     const input = {
       prompt,
       system_prompt: systemMessage,
-      ...(this.params || {}),
+      ...this.params,
     };
     let res = null;
     try {
@@ -45,8 +45,8 @@ export class ReplicateAPI {
         }
       }
       res = result;
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       res = "My brain disconnected, try again.";
     }
     console.log("Received.");

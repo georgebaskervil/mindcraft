@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { NPCData } from "./data.js";
 import { ItemGoal } from "./item_goal.js";
 import { BuildGoal } from "./build_goal.js";
@@ -7,7 +7,7 @@ import * as skills from "../library/skills.js";
 import * as world from "../library/world.js";
 import * as mc from "../../utils/mcdata.js";
 
-export class NPCContoller {
+export class NPCController {
   constructor(agent) {
     this.agent = agent;
     this.data = NPCData.fromObject(agent.prompter.profile.npc);
@@ -50,7 +50,7 @@ export class NPCContoller {
           );
         }
       }
-    } catch (e) {
+    } catch {
       console.log("Error reading construction file");
     }
 
@@ -82,7 +82,7 @@ export class NPCContoller {
         return;
       }
 
-      // Persue goal
+      // Pursue goal
       if (!this.agent.actions.resume_func) {
         this.executeNext();
         this.agent.history.save();
@@ -114,7 +114,7 @@ export class NPCContoller {
     );
     if (res) {
       this.data.curr_goal = res;
-      console.log("Set new goal: ", res.name, " x", res.quantity);
+      console.log("Set new goal:", res.name, "x", res.quantity);
     } else {
       console.log("Error setting new goal.");
     }
@@ -128,7 +128,7 @@ export class NPCContoller {
       await skills.moveAway(this.agent.bot, 2);
     });
 
-    if (!this.data.do_routine || this.agent.bot.time.timeOfDay < 13000) {
+    if (!this.data.do_routine || this.agent.bot.time.timeOfDay < 13_000) {
       // Exit any buildings
       let building = this.currentBuilding();
       if (building == this.data.home) {
@@ -174,7 +174,7 @@ export class NPCContoller {
     // If we need more blocks to complete a building, get those first
     let goals = this.temp_goals.concat(this.data.goals);
     if (this.data.curr_goal) {
-      goals = goals.concat([this.data.curr_goal]);
+      goals = [...goals, this.data.curr_goal];
     }
     this.temp_goals = [];
 

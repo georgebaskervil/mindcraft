@@ -1,4 +1,4 @@
-import { writeFile, readFile, mkdirSync } from "fs";
+import { writeFile, readFile, mkdirSync } from "node:fs";
 import settings from "../../settings.js";
 import { makeCompartment } from "./library/lockdown.js";
 import * as skills from "./library/skills.js";
@@ -15,15 +15,15 @@ export class Coder {
     this.code_template = "";
     this.code_lint_template = "";
 
-    readFile("./bots/execTemplate.js", "utf8", (err, data) => {
-      if (err) {
-        throw err;
+    readFile("./bots/execTemplate.js", "utf8", (error, data) => {
+      if (error) {
+        throw error;
       }
       this.code_template = data;
     });
-    readFile("./bots/lintTemplate.js", "utf8", (err, data) => {
-      if (err) {
-        throw err;
+    readFile("./bots/lintTemplate.js", "utf8", (error, data) => {
+      if (error) {
+        throw error;
       }
       this.code_lint_template = data;
     });
@@ -39,7 +39,7 @@ export class Coder {
     while ((match = skillRegex.exec(code)) !== null) {
       skills.push(match[1]);
     }
-    const allDocs = await this.agent.prompter.skill_libary.getAllSkillDocs();
+    const allDocs = await this.agent.prompter.skill_library.getAllSkillDocs();
     // check function exists
     const missingSkills = skills.filter((skill) => !!allDocs[skill]);
     if (missingSkills.length > 0) {
@@ -54,10 +54,10 @@ export class Coder {
     const eslint = new ESLint();
     const results = await eslint.lintText(code);
     const codeLines = code.split("\n");
-    const exceptions = results.map((r) => r.messages).flat();
+    const exceptions = results.flatMap((r) => r.messages);
 
     if (exceptions.length > 0) {
-      exceptions.forEach((exc, index) => {
+      for (const [index, exc] of exceptions.entries()) {
         if (exc.line && exc.column) {
           const errorLine =
             codeLines[exc.line - 1]?.trim() ||
@@ -67,7 +67,7 @@ export class Coder {
           result += `Location: Line ${exc.line}, Column ${exc.column}\n`;
           result += `Related Code Line: ${errorLine}\n`;
         }
-      });
+      }
       result += "The code contains exceptions and cannot continue execution.";
     } else {
       return null; //no error
@@ -79,7 +79,7 @@ export class Coder {
   // write custom code to file and prepare for evaluation
   async stageCode(code) {
     code = this.sanitizeCode(code);
-    let src = "";
+    let source = "";
     code = code.replaceAll("console.log(", "log(bot,");
     code = code.replaceAll('log("', 'log(bot,"');
 
@@ -91,10 +91,10 @@ export class Coder {
       '; if(bot.interrupt_code) {log(bot, "Code interrupted.");return;}\n',
     );
     for (let line of code.split("\n")) {
-      src += `    ${line}\n`;
+      source += `    ${line}\n`;
     }
-    let src_lint_copy = this.code_lint_template.replace("/* CODE HERE */", src);
-    src = this.code_template.replace("/* CODE HERE */", src);
+    let source_lint_copy = this.code_lint_template.replace("/* CODE HERE */", source);
+    source = this.code_template.replace("/* CODE HERE */", source);
 
     let filename = this.file_counter + ".js";
     // if (this.file_counter > 0) {
@@ -108,7 +108,7 @@ export class Coder {
 
     let write_result = await this.writeFilePromise(
       "." + this.fp + filename,
-      src,
+      source,
     );
     // This is where we determine the environment the agent's code should be exposed to.
     // It will only have access to these things, (in addition to basic javascript objects like Array, Object, etc.)
@@ -119,13 +119,13 @@ export class Coder {
       world,
       Vec3,
     });
-    const mainFn = compartment.evaluate(src);
+    const mainFunction = compartment.evaluate(source);
 
     if (write_result) {
       console.error("Error writing code execution file: " + result);
       return null;
     }
-    return { func: { main: mainFn }, src_lint_copy: src_lint_copy };
+    return { func: { main: mainFunction }, src_lint_copy: source_lint_copy };
   }
 
   sanitizeCode(code) {
@@ -140,12 +140,12 @@ export class Coder {
     return code;
   }
 
-  writeFilePromise(filename, src) {
+  writeFilePromise(filename, source) {
     // makes it so we can await this function
     return new Promise((resolve, reject) => {
-      writeFile(filename, src, (err) => {
-        if (err) {
-          reject(err);
+      writeFile(filename, source, (error) => {
+        if (error) {
+          reject(error);
         } else {
           resolve();
         }
@@ -184,7 +184,7 @@ export class Coder {
       interrupted: true,
       timedout: false,
     };
-    for (let i = 0; i < 5; i++) {
+    for (let index = 0; index < 5; index++) {
       if (this.agent.bot.interrupt_code) {
         return interrupt_return;
       }
@@ -194,12 +194,12 @@ export class Coder {
       if (this.agent.bot.interrupt_code) {
         return interrupt_return;
       }
-      let contains_code = res.indexOf("```") !== -1;
+      let contains_code = res.includes("```");
       if (!contains_code) {
-        if (res.indexOf("!newAction") !== -1) {
+        if (res.includes("!newAction")) {
           messages.push({
             role: "assistant",
-            content: res.substring(0, res.indexOf("!newAction")),
+            content: res.slice(0, Math.max(0, res.indexOf("!newAction"))),
           });
           continue; // using newaction will continue the loop
         }
@@ -223,8 +223,8 @@ export class Coder {
       code = res.substring(res.indexOf("```") + 3, res.lastIndexOf("```"));
       const result = await this.stageCode(code);
       const executionModuleExports = result.func;
-      let src_lint_copy = result.src_lint_copy;
-      const analysisResult = await this.lintCode(src_lint_copy);
+      let source_lint_copy = result.src_lint_copy;
+      const analysisResult = await this.lintCode(source_lint_copy);
       if (analysisResult) {
         const message =
           "Error: Code syntax error. Please try again:" +
@@ -285,8 +285,7 @@ export class Coder {
       messages.push({
         role: "assistant",
         content: res,
-      });
-      messages.push({
+      }, {
         role: "system",
         content: code_return.message + "\nCode failed. Please try again:",
       });

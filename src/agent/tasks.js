@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 import { executeCommand } from "./commands/index.js";
 import { getPosition } from "./library/world.js";
 import settings from "../../settings.js";
@@ -14,7 +14,7 @@ export class TaskValidator {
     try {
       let valid = false;
       let total_targets = 0;
-      this.agent.bot.inventory.slots.forEach((slot) => {
+      for (const slot of this.agent.bot.inventory.slots) {
         if (slot && slot.name.toLowerCase() === this.target) {
           total_targets += slot.count;
         }
@@ -26,7 +26,7 @@ export class TaskValidator {
           valid = true;
           console.log("Task is complete");
         }
-      });
+      }
       if (total_targets >= this.number_of_target) {
         valid = true;
         console.log("Task is complete");
@@ -52,12 +52,7 @@ export class Task {
       this.taskTimeout = this.data.timeout || 300;
       this.taskStartTime = Date.now();
       this.validator = new TaskValidator(this.data, this.agent);
-      if (this.data.blocked_actions) {
-        this.blocked_actions =
-          this.data.blocked_actions[this.agent.count_id.toString()] || [];
-      } else {
-        this.blocked_actions = [];
-      }
+      this.blocked_actions = this.data.blocked_actions ? this.data.blocked_actions[this.agent.count_id.toString()] || [] : [];
       this.restrict_to_inventory = !!this.data.restrict_to_inventory;
       if (this.data.goal) {
         this.blocked_actions.push("!endGoal");
@@ -155,7 +150,7 @@ export class Task {
     // Finding if there is a human player on the server
     for (const playerName in bot.players) {
       const player = bot.players[playerName];
-      if (!available_agents.some((n) => n === playerName)) {
+      if (!available_agents.includes(playerName)) {
         console.log("Found human player:", player.username);
         human_player_name = player.username;
         break;
@@ -194,7 +189,7 @@ export class Task {
 
     if (this.data.agent_count && this.data.agent_count > 1) {
       // TODO wait for other bots to join
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+      await new Promise((resolve) => setTimeout(resolve, 10_000));
       if (available_agents.length < this.data.agent_count) {
         console.log(
           `Missing ${this.data.agent_count - available_agents.length} bot(s).`,
@@ -208,7 +203,7 @@ export class Task {
     }
 
     if (this.data.conversation && this.agent.count_id === 0) {
-      let other_name = available_agents.filter((n) => n !== name)[0];
+      let other_name = available_agents.find((n) => n !== name);
       await executeCommand(
         this.agent,
         `!startConversation("${other_name}", "${this.data.conversation}")`,

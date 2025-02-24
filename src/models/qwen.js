@@ -3,9 +3,9 @@ import { getKey, hasKey } from "../utils/keys.js";
 import { strictFormat } from "../utils/text.js";
 
 export class Qwen {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
-    this.params = params;
+    this.params = parameters;
     let config = {};
 
     config.baseURL = url || "https://dashscope.aliyuncs.com/compatible-mode/v1";
@@ -23,7 +23,7 @@ export class Qwen {
       model: this.model_name || "qwen-plus",
       messages,
       stop: stop_seq,
-      ...(this.params || {}),
+      ...this.params,
     };
 
     let res = null;
@@ -36,10 +36,10 @@ export class Qwen {
       }
       console.log("Received.");
       res = completion.choices[0].message.content;
-    } catch (err) {
+    } catch (error) {
       if (
-        (err.message == "Context length exceeded" ||
-          err.code == "context_length_exceeded") &&
+        (error.message == "Context length exceeded" ||
+          error.code == "context_length_exceeded") &&
         turns.length > 1
       ) {
         console.log(
@@ -47,7 +47,7 @@ export class Qwen {
         );
         return await this.sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
-        console.log(err);
+        console.log(error);
         res = "My brain disconnected, try again.";
       }
     }
@@ -67,15 +67,15 @@ export class Qwen {
           encoding_format: "float",
         });
         return data[0].embedding;
-      } catch (err) {
-        if (err.status === 429) {
+      } catch (error) {
+        if (error.status === 429) {
           // If a rate limit error occurs, calculate the exponential backoff with a random delay (1-5 seconds)
           const delay =
             Math.pow(2, retries) * 1000 + Math.floor(Math.random() * 2000);
           // console.log(`Rate limit hit, retrying in ${delay} ms...`);
           await new Promise((resolve) => setTimeout(resolve, delay)); // Wait for the delay before retrying
         } else {
-          throw err;
+          throw error;
         }
       }
     }

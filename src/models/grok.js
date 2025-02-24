@@ -3,17 +3,13 @@ import { getKey } from "../utils/keys.js";
 
 // xAI doesn't supply a SDK for their models, but fully supports OpenAI and Anthropic SDKs
 export class Grok {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
     this.url = url;
-    this.params = params;
+    this.params = parameters;
 
     let config = {};
-    if (url) {
-      config.baseURL = url;
-    } else {
-      config.baseURL = "https://api.x.ai/v1";
-    }
+    config.baseURL = url ? url : "https://api.x.ai/v1";
 
     config.apiKey = getKey("XAI_API_KEY");
 
@@ -27,7 +23,7 @@ export class Grok {
       model: this.model_name || "grok-beta",
       messages,
       stop: [stop_seq],
-      ...(this.params || {}),
+      ...this.params,
     };
 
     let res = null;
@@ -40,10 +36,10 @@ export class Grok {
       }
       console.log("Received.");
       res = completion.choices[0].message.content;
-    } catch (err) {
+    } catch (error) {
       if (
-        (err.message == "Context length exceeded" ||
-          err.code == "context_length_exceeded") &&
+        (error.message == "Context length exceeded" ||
+          error.code == "context_length_exceeded") &&
         turns.length > 1
       ) {
         console.log(
@@ -51,12 +47,12 @@ export class Grok {
         );
         return await this.sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
-        console.log(err);
+        console.log(error);
         res = "My brain disconnected, try again.";
       }
     }
     // sometimes outputs special token <|separator|>, just replace it
-    return res.replace(/<\|separator\|>/g, "*no response*");
+    return res.replaceAll('<|separator|>', "*no response*");
   }
 
   async embed(text) {

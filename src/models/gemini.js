@@ -3,9 +3,9 @@ import { toSinglePrompt, strictFormat } from "../utils/text.js";
 import { getKey } from "../utils/keys.js";
 
 export class Gemini {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
-    this.params = params;
+    this.params = parameters;
     this.url = url;
     this.safetySettings = [
       {
@@ -40,17 +40,13 @@ export class Gemini {
       // systemInstruction does not work bc google is trash
     };
 
-    if (this.url) {
-      model = this.genAI.getGenerativeModel(
+    model = this.url ? this.genAI.getGenerativeModel(
         modelConfig,
         { baseUrl: this.url },
         { safetySettings: this.safetySettings },
-      );
-    } else {
-      model = this.genAI.getGenerativeModel(modelConfig, {
+      ) : this.genAI.getGenerativeModel(modelConfig, {
         safetySettings: this.safetySettings,
       });
-    }
 
     console.log("Awaiting Google API response...");
 
@@ -67,7 +63,7 @@ export class Gemini {
     const result = await model.generateContent({
       contents,
       generationConfig: {
-        ...(this.params || {}),
+        ...this.params,
       },
     });
     const response = await result.response;
@@ -79,14 +75,10 @@ export class Gemini {
 
   async embed(text) {
     let model;
-    if (this.url) {
-      model = this.genAI.getGenerativeModel(
+    model = this.url ? this.genAI.getGenerativeModel(
         { model: "text-embedding-004" },
         { baseUrl: this.url },
-      );
-    } else {
-      model = this.genAI.getGenerativeModel({ model: "text-embedding-004" });
-    }
+      ) : this.genAI.getGenerativeModel({ model: "text-embedding-004" });
 
     const result = await model.embedContent(text);
     return result.embedding.values;

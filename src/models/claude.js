@@ -3,9 +3,9 @@ import { strictFormat } from "../utils/text.js";
 import { getKey } from "../utils/keys.js";
 
 export class Claude {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
-    this.params = params || {};
+    this.params = parameters || {};
 
     let config = {};
     if (url) {
@@ -29,13 +29,13 @@ export class Claude {
         model: this.model_name || "claude-3-sonnet-20240229",
         system: systemMessage,
         messages: messages,
-        ...(this.params || {}),
+        ...this.params,
       });
 
       console.log("Received.");
       res = resp.content[0].text;
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       res = "My brain disconnected, try again.";
     }
     return res;

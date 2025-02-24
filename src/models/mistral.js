@@ -5,9 +5,9 @@ import { strictFormat } from "../utils/text.js";
 export class Mistral {
   #client;
 
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
-    this.params = params;
+    this.params = parameters;
 
     if (typeof url === "string") {
       console.warn("Mistral does not support custom URL's, ignoring!");
@@ -24,11 +24,11 @@ export class Mistral {
     });
 
     // Prevents the following code from running when model not specified
-    if (typeof this.model_name === "undefined") return;
+    if (this.model_name === undefined) {return;}
 
     // get the model name without the "mistral" or "mistralai" prefix
     // e.g "mistral/mistral-large-latest" -> "mistral-large-latest"
-    if (typeof model_name.split("/")[1] !== "undefined") {
+    if (model_name.split("/")[1] !== undefined) {
       this.model_name = model_name.split("/")[1];
     }
   }
@@ -45,12 +45,12 @@ export class Mistral {
       const response = await this.#client.chat.complete({
         model,
         messages,
-        ...(this.params || {}),
+        ...this.params,
       });
 
       result = response.choices[0].message.content;
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
 
       result = "My brain disconnected, try again.";
     }

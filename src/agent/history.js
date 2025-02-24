@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, mkdirSync, existsSync } from "fs";
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from "node:fs";
 import { NPCData } from "./npc/data.js";
 import settings from "../../settings.js";
 
@@ -40,16 +40,16 @@ export class History {
         "...(Memory truncated to 500 chars. Compress it more next time)";
     }
 
-    console.log("Memory updated to: ", this.memory);
+    console.log("Memory updated to:", this.memory);
   }
 
   async appendFullHistory(to_store) {
     if (this.full_history_fp === undefined) {
       const string_timestamp = new Date()
         .toLocaleString()
-        .replace(/[/:]/g, "-")
-        .replace(/ /g, "")
-        .replace(/,/g, "_");
+        .replaceAll(/[/:]/g, "-")
+        .replaceAll(' ', "")
+        .replaceAll(',', "_");
       this.full_history_fp = `./bots/${this.name}/histories/${string_timestamp}.json`;
       writeFileSync(this.full_history_fp, "[]", "utf8");
     }
@@ -62,9 +62,9 @@ export class History {
         JSON.stringify(full_history, null, 4),
         "utf8",
       );
-    } catch (err) {
+    } catch (error) {
       console.error(
-        `Error reading ${this.name}'s full history file: ${err.message}`,
+        `Error reading ${this.name}'s full history file: ${error.message}`,
       );
     }
   }

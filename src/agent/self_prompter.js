@@ -66,10 +66,13 @@ export class SelfPrompter {
     let no_command_count = 0;
     const MAX_NO_COMMAND = 3;
     while (!this.interrupt) {
-      const msg = `You are self-prompting with the goal: '${this.prompt}'. Your next response MUST contain a command with this syntax: !commandName. Respond:`;
+      const message = `You are self-prompting with the goal: '${this.prompt}'. Your next response MUST contain a command with this syntax: !commandName. Respond:`;
 
-      let used_command = await this.agent.handleMessage("system", msg, -1);
-      if (!used_command) {
+      let used_command = await this.agent.handleMessage("system", message, -1);
+      if (used_command) {
+        no_command_count = 0;
+        await new Promise((r) => setTimeout(r, this.cooldown));
+      } else {
         no_command_count++;
         if (no_command_count >= MAX_NO_COMMAND) {
           let out = `Agent did not use command in the last ${MAX_NO_COMMAND} auto-prompts. Stopping auto-prompting.`;
@@ -78,9 +81,6 @@ export class SelfPrompter {
           this.state = STOPPED;
           break;
         }
-      } else {
-        no_command_count = 0;
-        await new Promise((r) => setTimeout(r, this.cooldown));
       }
     }
     console.log("self prompt loop stopped");

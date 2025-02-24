@@ -9,32 +9,32 @@ export class NPCData {
   }
 
   toObject() {
-    let obj = {};
+    let object = {};
     if (this.goals.length > 0) {
-      obj.goals = this.goals;
+      object.goals = this.goals;
     }
     if (this.curr_goal) {
-      obj.curr_goal = this.curr_goal;
+      object.curr_goal = this.curr_goal;
     }
     if (Object.keys(this.built).length > 0) {
-      obj.built = this.built;
+      object.built = this.built;
     }
     if (this.home) {
-      obj.home = this.home;
+      object.home = this.home;
     }
-    obj.do_routine = this.do_routine;
-    obj.do_set_goal = this.do_set_goal;
-    return obj;
+    object.do_routine = this.do_routine;
+    object.do_set_goal = this.do_set_goal;
+    return object;
   }
 
-  static fromObject(obj) {
+  static fromObject(object) {
     let npc = new NPCData();
-    if (!obj) {
+    if (!object) {
       return npc;
     }
-    if (obj.goals) {
+    if (object.goals) {
       npc.goals = [];
-      for (let goal of obj.goals) {
+      for (let goal of object.goals) {
         if (typeof goal === "string") {
           npc.goals.push({ name: goal, quantity: 1 });
         } else {
@@ -42,20 +42,20 @@ export class NPCData {
         }
       }
     }
-    if (obj.curr_goal) {
-      npc.curr_goal = obj.curr_goal;
+    if (object.curr_goal) {
+      npc.curr_goal = object.curr_goal;
     }
-    if (obj.built) {
-      npc.built = obj.built;
+    if (object.built) {
+      npc.built = object.built;
     }
-    if (obj.home) {
-      npc.home = obj.home;
+    if (object.home) {
+      npc.home = object.home;
     }
-    if (obj.do_routine !== undefined) {
-      npc.do_routine = obj.do_routine;
+    if (object.do_routine !== undefined) {
+      npc.do_routine = object.do_routine;
     }
-    if (obj.do_set_goal !== undefined) {
-      npc.do_set_goal = obj.do_set_goal;
+    if (object.do_set_goal !== undefined) {
+      npc.do_set_goal = object.do_set_goal;
     }
     return npc;
   }

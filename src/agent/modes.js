@@ -119,7 +119,7 @@ const modes_list = [
         execute(this, agent, async () => {
           const crashTimeout = setTimeout(() => {
             agent.cleanKill("Got stuck and couldn't get unstuck");
-          }, 10000);
+          }, 10_000);
           await skills.moveAway(bot, 5);
           clearTimeout(crashTimeout);
           say(agent, "I'm free.");
@@ -321,7 +321,7 @@ const modes_list = [
           const pitch = (Math.random() * Math.PI) / 2 - Math.PI / 4;
           agent.bot.look(yaw, pitch, false);
         }
-        this.next_change = Date.now() + Math.random() * 10000 + 2000;
+        this.next_change = Date.now() + Math.random() * 10_000 + 2000;
       }
     },
   },
@@ -337,7 +337,7 @@ const modes_list = [
   },
 ];
 
-async function execute(mode, agent, func, timeout = -1) {
+async function execute(mode, agent, function_, timeout = -1) {
   if (agent.self_prompter.isActive()) {
     agent.self_prompter.stopLoop();
   }
@@ -346,7 +346,7 @@ async function execute(mode, agent, func, timeout = -1) {
   let code_return = await agent.actions.runAction(
     `mode:${mode.name}`,
     async () => {
-      await func();
+      await function_();
     },
     { timeout },
   );
@@ -391,7 +391,7 @@ class ModeController {
   }
 
   exists(mode_name) {
-    return modes_map[mode_name] != null;
+    return modes_map[mode_name] != undefined;
   }
 
   setOn(mode_name, on) {
@@ -444,8 +444,8 @@ class ModeController {
     }
     for (let mode of modes_list) {
       let interruptible =
-        mode.interrupts.some((i) => i === "all") ||
-        mode.interrupts.some((i) => i === _agent.actions.currentActionLabel);
+        mode.interrupts.includes("all") ||
+        mode.interrupts.includes(_agent.actions.currentActionLabel);
       if (
         mode.on &&
         !mode.paused &&

@@ -3,10 +3,10 @@ import { getKey } from "../utils/keys.js";
 
 // Umbrella class for Mixtral, LLama, Gemma...
 export class GroqCloudAPI {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
     this.url = url;
-    this.params = params || {};
+    this.params = parameters || {};
     // ReplicateAPI theft :3
     if (this.url) {
       console.warn(
@@ -22,14 +22,14 @@ export class GroqCloudAPI {
     try {
       console.log("Awaiting Groq response...");
       if (!this.params.max_tokens) {
-        this.params.max_tokens = 16384;
+        this.params.max_tokens = 16_384;
       }
       let completion = await this.groq.chat.completions.create({
         messages: messages,
         model: this.model_name || "mixtral-8x7b-32768",
         stream: true,
         stop: stop_seq,
-        ...(this.params || {}),
+        ...this.params,
       });
 
       let temp_res = "";
@@ -38,8 +38,8 @@ export class GroqCloudAPI {
       }
 
       res = temp_res;
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       res = "My brain just kinda stopped working. Try again.";
     }
     return res;

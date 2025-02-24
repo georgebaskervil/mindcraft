@@ -52,7 +52,7 @@ class AgentServerProxy {
         this.agent.respondFunc("NO USERNAME", message);
       } catch (error) {
         console.error(
-          "Error: ",
+          "Error:",
           JSON.stringify(error, Object.getOwnPropertyNames(error)),
         );
       }

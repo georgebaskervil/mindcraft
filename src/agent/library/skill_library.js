@@ -14,15 +14,15 @@ export class SkillLibrary {
     this.skill_docs = skillDocs;
     if (this.embedding_model) {
       try {
-        const embeddingPromises = skillDocs.map((doc) => {
+        const embeddingPromises = skillDocs.map((document) => {
           return (async () => {
-            let func_name_desc = doc.split("\n").slice(0, 2).join("");
-            this.skill_docs_embeddings[doc] =
-              await this.embedding_model.embed(func_name_desc);
+            let function_name_desc = document.split("\n").slice(0, 2).join("");
+            this.skill_docs_embeddings[document] =
+              await this.embedding_model.embed(function_name_desc);
           })();
         });
         await Promise.all(embeddingPromises);
-      } catch (error) {
+      } catch {
         console.warn("Error with embedding model, using word-overlap instead.");
         this.embedding_model = null;
       }
@@ -33,44 +33,40 @@ export class SkillLibrary {
     return this.skill_docs;
   }
 
-  async getRelevantSkillDocs(message, select_num) {
+  async getRelevantSkillDocs(message, select_number) {
     if (!message) {
       // use filler message if none is provided
       message = "(no message)";
     }
-    let skill_doc_similarities = [];
-    if (!this.embedding_model) {
-      skill_doc_similarities = Object.keys(this.skill_docs)
-        .map((doc_key) => ({
-          doc_key,
-          similarity_score: wordOverlapScore(message, this.skill_docs[doc_key]),
+    let skill_document_similarities = [];
+    if (this.embedding_model) {
+      let latest_message_embedding = "";
+      skill_document_similarities = Object.keys(this.skill_docs_embeddings)
+        .map((document_key) => ({
+          doc_key: document_key,
+          similarity_score: cosineSimilarity(
+            latest_message_embedding,
+            this.skill_docs_embeddings[document_key],
+          ),
         }))
         .sort((a, b) => b.similarity_score - a.similarity_score);
     } else {
-      let latest_message_embedding = "";
-      skill_doc_similarities = Object.keys(this.skill_docs_embeddings)
-        .map((doc_key) => ({
-          doc_key,
-          similarity_score: cosineSimilarity(
-            latest_message_embedding,
-            this.skill_docs_embeddings[doc_key],
-          ),
+      skill_document_similarities = Object.keys(this.skill_docs)
+        .map((document_key) => ({
+          doc_key: document_key,
+          similarity_score: wordOverlapScore(message, this.skill_docs[document_key]),
         }))
         .sort((a, b) => b.similarity_score - a.similarity_score);
     }
 
-    let length = skill_doc_similarities.length;
-    if (typeof select_num !== "number" || isNaN(select_num) || select_num < 0) {
-      select_num = length;
-    } else {
-      select_num = Math.min(Math.floor(select_num), length);
-    }
-    let selected_docs = skill_doc_similarities.slice(0, select_num);
+    let length = skill_document_similarities.length;
+    select_number = typeof select_number !== "number" || isNaN(select_number) || select_number < 0 ? length : Math.min(Math.floor(select_number), length);
+    let selected_docs = skill_document_similarities.slice(0, select_number);
     let relevant_skill_docs =
-      "#### RELEVENT DOCS INFO ###\nThe following functions are listed in descending order of relevance.\n";
+      "#### RELEVANT DOCS INFO ###\nThe following functions are listed in descending order of relevance.\n";
     relevant_skill_docs += "SkillDocs:\n";
     relevant_skill_docs += selected_docs
-      .map((doc) => `${doc.doc_key}`)
+      .map((document) => `${document.doc_key}`)
       .join("\n### ");
     return relevant_skill_docs;
   }

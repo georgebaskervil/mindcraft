@@ -29,12 +29,17 @@ bun eslint . --fix
 echo "====================="
 echo "markdownlint results"
 echo "====================="
-bun markdownlint-cli2 '**/*.md' '!**/node_modules/**' '!**/licenses/**' --fix --config .markdownlint.json
+bun markdownlint-cli2 '**/*.md' '!**/node_modules/**' --fix --config .markdownlint.json
 
 echo "====================="
 echo "Prettier results"
 echo "====================="
 bun prettier --write . | grep -v "unchanged"
+
+echo "====================="
+echo "Typos results"
+echo "====================="
+typos -w
 
 echo "====================="
 echo "All static analysis checks performed"

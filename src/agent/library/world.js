@@ -18,17 +18,17 @@ export function getNearestFreeSpace(bot, size = 1, distance = 8) {
     maxDistance: distance,
     count: 1000,
   });
-  for (let i = 0; i < empty_pos.length; i++) {
+  for (const empty_po of empty_pos) {
     let empty = true;
     for (let x = 0; x < size; x++) {
       for (let z = 0; z < size; z++) {
-        let top = bot.blockAt(empty_pos[i].offset(x, 0, z));
-        let bottom = bot.blockAt(empty_pos[i].offset(x, -1, z));
+        let top = bot.blockAt(empty_po.offset(x, 0, z));
+        let bottom = bot.blockAt(empty_po.offset(x, -1, z));
         if (
           !top ||
           !top.name == "air" ||
           !bottom ||
-          bottom.drops.length == 0 ||
+          bottom.drops.length === 0 ||
           !bottom.diggable
         ) {
           empty = false;
@@ -40,7 +40,7 @@ export function getNearestFreeSpace(bot, size = 1, distance = 8) {
       }
     }
     if (empty) {
-      return empty_pos[i];
+      return empty_po;
     }
   }
 }
@@ -49,9 +49,9 @@ export function getBlockAtPosition(bot, x = 0, y = 0, z = 0) {
   /**
    * Get a block from the bot's relative position
    * @param {Bot} bot - The bot to get the block for.
-   * @param {number} x - The relative x offset to serach, default 0.
-   * @param {number} y - The relative y offset to serach, default 0.
-   * @param {number} y - The relative z offset to serach, default 0.
+   * @param {number} x - The relative x offset to search, default 0.
+   * @param {number} y - The relative y offset to search, default 0.
+   * @param {number} y - The relative z offset to search, default 0.
    * @returns {Block} - The nearest block.
    * @example
    * let blockBelow = world.getBlockAtPosition(bot, 0, -1, 0);
@@ -112,8 +112,8 @@ export function getFirstBlockAboveHead(
   // The block above, stops when it finds a solid block .
   let block_above = { name: "air" };
   let height = 0;
-  for (let i = 0; i < distance; i++) {
-    let block = bot.blockAt(bot.entity.position.offset(0, i + 2, 0));
+  for (let index = 0; index < distance; index++) {
+    let block = bot.blockAt(bot.entity.position.offset(0, index + 2, 0));
     if (!block) {
       block = { name: "air" };
     }
@@ -123,7 +123,7 @@ export function getFirstBlockAboveHead(
     }
     // Defaults to any block
     block_above = block;
-    height = i;
+    height = index;
     break;
   }
 
@@ -138,7 +138,7 @@ export function getNearestBlocks(
   bot,
   block_types = null,
   distance = 16,
-  count = 10000,
+  count = 10_000,
 ) {
   /**
    * Get a list of the nearest blocks of the given types.
@@ -169,16 +169,16 @@ export function getNearestBlocks(
     count: count,
   });
   let blocks = [];
-  for (let i = 0; i < positions.length; i++) {
-    let block = bot.blockAt(positions[i]);
-    let distance = positions[i].distanceTo(bot.entity.position);
+  for (const position of positions) {
+    let block = bot.blockAt(position);
+    let distance = position.distanceTo(bot.entity.position);
     blocks.push({ block: block, distance: distance });
   }
   blocks.sort((a, b) => a.distance - b.distance);
 
   let res = [];
-  for (let i = 0; i < blocks.length; i++) {
-    res.push(blocks[i].block);
+  for (const block of blocks) {
+    res.push(block.block);
   }
   return res;
 }
@@ -211,8 +211,8 @@ export function getNearbyEntities(bot, maxDistance = 16) {
   }
   entities.sort((a, b) => a.distance - b.distance);
   let res = [];
-  for (let i = 0; i < entities.length; i++) {
-    res.push(entities[i].entity);
+  for (const entity of entities) {
+    res.push(entity.entity);
   }
   return res;
 }
@@ -226,7 +226,7 @@ export function getNearestEntityWhere(bot, predicate, maxDistance = 16) {
 }
 
 export function getNearbyPlayers(bot, maxDistance) {
-  if (maxDistance == null) {
+  if (maxDistance == undefined) {
     maxDistance = 16;
   }
   let players = [];
@@ -241,8 +241,8 @@ export function getNearbyPlayers(bot, maxDistance) {
   }
   players.sort((a, b) => a.distance - b.distance);
   let res = [];
-  for (let i = 0; i < players.length; i++) {
-    res.push(players[i].entity);
+  for (const player of players) {
+    res.push(player.entity);
   }
   return res;
 }
@@ -250,7 +250,7 @@ export function getNearbyPlayers(bot, maxDistance) {
 export function getInventoryStacks(bot) {
   let inventory = [];
   for (const item of bot.inventory.items()) {
-    if (item != null) {
+    if (item != undefined) {
       inventory.push(item);
     }
   }
@@ -269,8 +269,8 @@ export function getInventoryCounts(bot) {
    **/
   let inventory = {};
   for (const item of bot.inventory.items()) {
-    if (item != null) {
-      if (inventory[item.name] == null) {
+    if (item != undefined) {
+      if (inventory[item.name] == undefined) {
         inventory[item.name] = 0;
       }
       inventory[item.name] += item.count;
@@ -290,7 +290,7 @@ export function getCraftableItems(bot) {
   let table = getNearestBlock(bot, "crafting_table");
   if (!table) {
     for (const item of bot.inventory.items()) {
-      if (item != null && item.name === "crafting_table") {
+      if (item != undefined && item.name === "crafting_table") {
         table = item;
         break;
       }
@@ -328,9 +328,9 @@ export function getNearbyEntityTypes(bot) {
    **/
   let mobs = getNearbyEntities(bot, 16);
   let found = [];
-  for (let i = 0; i < mobs.length; i++) {
-    if (!found.includes(mobs[i].name)) {
-      found.push(mobs[i].name);
+  for (const mob of mobs) {
+    if (!found.includes(mob.name)) {
+      found.push(mob.name);
     }
   }
   return found;
@@ -346,12 +346,12 @@ export function getNearbyPlayerNames(bot) {
    **/
   let players = getNearbyPlayers(bot, 64);
   let found = [];
-  for (let i = 0; i < players.length; i++) {
+  for (const player of players) {
     if (
-      !found.includes(players[i].username) &&
-      players[i].username != bot.username
+      !found.includes(player.username) &&
+      player.username != bot.username
     ) {
-      found.push(players[i].username);
+      found.push(player.username);
     }
   }
   return found;
@@ -368,9 +368,9 @@ export function getNearbyBlockTypes(bot, distance = 16) {
    **/
   let blocks = getNearestBlocks(bot, null, distance);
   let found = [];
-  for (let i = 0; i < blocks.length; i++) {
-    if (!found.includes(blocks[i].name)) {
-      found.push(blocks[i].name);
+  for (const block of blocks) {
+    if (!found.includes(block.name)) {
+      found.push(block.name);
     }
   }
   return found;

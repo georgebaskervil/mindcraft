@@ -2,22 +2,22 @@ import * as skills from "../library/skills.js";
 import settings from "../../../settings.js";
 import convoManager from "../conversation.js";
 
-function runAsAction(actionFn, resume = false, timeout = -1) {
+function runAsAction(actionFunction, resume = false, timeout = -1) {
   let actionLabel = null; // Will be set on first use
 
-  const wrappedAction = async function (agent, ...args) {
+  const wrappedAction = async function (agent, ...arguments_) {
     // Set actionLabel only once, when the action is first created
     if (!actionLabel) {
-      const actionObj = actionsList.find((a) => a.perform === wrappedAction);
-      actionLabel = actionObj.name.substring(1); // Remove the ! prefix
+      const actionObject = actionsList.find((a) => a.perform === wrappedAction);
+      actionLabel = actionObject.name.slice(1); // Remove the ! prefix
     }
 
-    const actionFnWithAgent = async () => {
-      await actionFn(agent, ...args);
+    const actionFunctionWithAgent = async () => {
+      await actionFunction(agent, ...arguments_);
     };
     const code_return = await agent.actions.runAction(
       `action:${actionLabel}`,
-      actionFnWithAgent,
+      actionFunctionWithAgent,
       { timeout, resume },
     );
     if (code_return.interrupted && !code_return.timedout) {
@@ -61,11 +61,11 @@ export const actionsList = [
       agent.clearBotLogs();
       agent.actions.cancelResume();
       agent.bot.emit("idle");
-      let msg = "Agent stopped.";
+      let message = "Agent stopped.";
       if (agent.self_prompter.isActive()) {
-        msg += " Self-prompting still active.";
+        message += " Self-prompting still active.";
       }
-      return msg;
+      return message;
     },
   },
   {
@@ -128,8 +128,8 @@ export const actionsList = [
         domain: [0, Infinity],
       },
     },
-    perform: runAsAction(async (agent, player_name, follow_dist) => {
-      await skills.followPlayer(agent.bot, player_name, follow_dist);
+    perform: runAsAction(async (agent, player_name, follow_distribution) => {
+      await skills.followPlayer(agent.bot, player_name, follow_distribution);
     }, true),
   },
   {
@@ -259,8 +259,8 @@ export const actionsList = [
         domain: [1, Number.MAX_SAFE_INTEGER],
       },
     },
-    perform: runAsAction(async (agent, player_name, item_name, num) => {
-      await skills.giveToPlayer(agent.bot, item_name, player_name, num);
+    perform: runAsAction(async (agent, player_name, item_name, number_) => {
+      await skills.giveToPlayer(agent.bot, item_name, player_name, number_);
     }),
   },
   {
@@ -303,8 +303,8 @@ export const actionsList = [
         domain: [1, Number.MAX_SAFE_INTEGER],
       },
     },
-    perform: runAsAction(async (agent, item_name, num) => {
-      await skills.putInChest(agent.bot, item_name, num);
+    perform: runAsAction(async (agent, item_name, number_) => {
+      await skills.putInChest(agent.bot, item_name, number_);
     }),
   },
   {
@@ -321,8 +321,8 @@ export const actionsList = [
         domain: [1, Number.MAX_SAFE_INTEGER],
       },
     },
-    perform: runAsAction(async (agent, item_name, num) => {
-      await skills.takeFromChest(agent.bot, item_name, num);
+    perform: runAsAction(async (agent, item_name, number_) => {
+      await skills.takeFromChest(agent.bot, item_name, number_);
     }),
   },
   {
@@ -347,10 +347,10 @@ export const actionsList = [
         domain: [1, Number.MAX_SAFE_INTEGER],
       },
     },
-    perform: runAsAction(async (agent, item_name, num) => {
+    perform: runAsAction(async (agent, item_name, number_) => {
       const start_loc = agent.bot.entity.position;
       await skills.moveAway(agent.bot, 5);
-      await skills.discard(agent.bot, item_name, num);
+      await skills.discard(agent.bot, item_name, number_);
       await skills.goToPosition(
         agent.bot,
         start_loc.x,
@@ -372,8 +372,8 @@ export const actionsList = [
       },
     },
     perform: runAsAction(
-      async (agent, type, num) => {
-        await skills.collectBlock(agent.bot, type, num);
+      async (agent, type, number_) => {
+        await skills.collectBlock(agent.bot, type, number_);
       },
       false,
       10,
@@ -394,8 +394,8 @@ export const actionsList = [
         domain: [1, Number.MAX_SAFE_INTEGER],
       },
     },
-    perform: runAsAction(async (agent, recipe_name, num) => {
-      await skills.craftRecipe(agent.bot, recipe_name, num);
+    perform: runAsAction(async (agent, recipe_name, number_) => {
+      await skills.craftRecipe(agent.bot, recipe_name, number_);
     }),
   },
   {
@@ -412,8 +412,8 @@ export const actionsList = [
         domain: [1, Number.MAX_SAFE_INTEGER],
       },
     },
-    perform: runAsAction(async (agent, item_name, num) => {
-      let success = await skills.smeltItem(agent.bot, item_name, num);
+    perform: runAsAction(async (agent, item_name, number_) => {
+      let success = await skills.smeltItem(agent.bot, item_name, number_);
       if (success) {
         setTimeout(() => {
           agent.cleanKill("Safely restarting to update inventory.");
@@ -599,7 +599,7 @@ export const actionsList = [
         return `Not in conversation with ${player_name}.`;
       }
       convoManager.endConversation(player_name);
-      return `Converstaion with ${player_name} ended.`;
+      return `Conversation with ${player_name} ended.`;
     },
   },
   // { // commented for now, causes confusion with goal command

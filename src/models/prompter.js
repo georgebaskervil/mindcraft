@@ -1,4 +1,4 @@
-import { readFileSync, mkdirSync, writeFileSync } from "fs";
+import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { Examples } from "../utils/examples.js";
 import { getCommandDocs } from "../agent/commands/index.js";
 import { getSkillDocs } from "../agent/library/index.js";
@@ -71,11 +71,7 @@ export class Prompter {
 
     let embedding = this.profile.embedding;
     if (embedding === undefined) {
-      if (chat_model_profile.api !== "ollama") {
-        embedding = { api: chat_model_profile.api };
-      } else {
-        embedding = { api: "none" };
-      }
+      embedding = chat_model_profile.api === "ollama" ? { api: "none" } : { api: chat_model_profile.api };
     } else if (typeof embedding === "string" || embedding instanceof String) {
       embedding = { api: embedding };
     }
@@ -83,23 +79,48 @@ export class Prompter {
     console.log("Using embedding settings:", embedding);
 
     try {
-      if (embedding.api === "google") {
+      switch (embedding.api) {
+      case "google": {
         this.embedding_model = new Gemini(embedding.model, embedding.url);
-      } else if (embedding.api === "openai") {
+      
+      break;
+      }
+      case "openai": {
         this.embedding_model = new GPT(embedding.model, embedding.url);
-      } else if (embedding.api === "replicate") {
+      
+      break;
+      }
+      case "replicate": {
         this.embedding_model = new ReplicateAPI(embedding.model, embedding.url);
-      } else if (embedding.api === "ollama") {
+      
+      break;
+      }
+      case "ollama": {
         this.embedding_model = new Local(embedding.model, embedding.url);
-      } else if (embedding.api === "qwen") {
+      
+      break;
+      }
+      case "qwen": {
         this.embedding_model = new Qwen(embedding.model, embedding.url);
-      } else if (embedding.api === "mistral") {
+      
+      break;
+      }
+      case "mistral": {
         this.embedding_model = new Mistral(embedding.model, embedding.url);
-      } else if (embedding.api === "huggingface") {
+      
+      break;
+      }
+      case "huggingface": {
         this.embedding_model = new HuggingFace(embedding.model, embedding.url);
-      } else if (embedding.api === "novita") {
+      
+      break;
+      }
+      case "novita": {
         this.embedding_model = new Novita(embedding.model, embedding.url);
-      } else {
+      
+      break;
+      }
+      default: {
         this.embedding_model = null;
         let embedding_name = embedding ? embedding.api : "[NOT SPECIFIED]";
         console.warn(
@@ -108,22 +129,23 @@ export class Prompter {
             ". Using word-overlap instead, expect reduced performance. Recommend using a supported embedding model. See Readme.",
         );
       }
-    } catch (err) {
+      }
+    } catch (error) {
       console.warn(
         "Warning: Failed to initialize embedding model:",
-        err.message,
+        error.message,
       );
       console.log("Continuing anyway, using word-overlap instead.");
       this.embedding_model = null;
     }
-    this.skill_libary = new SkillLibrary(agent, this.embedding_model);
+    this.skill_library = new SkillLibrary(agent, this.embedding_model);
     mkdirSync(`./bots/${name}`, { recursive: true });
     writeFileSync(
       `./bots/${name}/last_profile.json`,
       JSON.stringify(this.profile, null, 4),
-      (err) => {
-        if (err) {
-          throw new Error("Failed to save profile:", err);
+      (error) => {
+        if (error) {
+          throw new Error("Failed to save profile:", error);
         }
         console.log("Copy profile saved.");
       },
@@ -181,50 +203,91 @@ export class Prompter {
 
   _createModel(profile) {
     let model = null;
-    if (profile.api === "google") {
+    switch (profile.api) {
+    case "google": {
       model = new Gemini(profile.model, profile.url, profile.params);
-    } else if (profile.api === "openai") {
+    
+    break;
+    }
+    case "openai": {
       model = new GPT(profile.model, profile.url, profile.params);
-    } else if (profile.api === "anthropic") {
+    
+    break;
+    }
+    case "anthropic": {
       model = new Claude(profile.model, profile.url, profile.params);
-    } else if (profile.api === "replicate") {
+    
+    break;
+    }
+    case "replicate": {
       model = new ReplicateAPI(
         profile.model.replace("replicate/", ""),
         profile.url,
         profile.params,
       );
-    } else if (profile.api === "ollama") {
+    
+    break;
+    }
+    case "ollama": {
       model = new Local(profile.model, profile.url, profile.params);
-    } else if (profile.api === "mistral") {
+    
+    break;
+    }
+    case "mistral": {
       model = new Mistral(profile.model, profile.url, profile.params);
-    } else if (profile.api === "groq") {
+    
+    break;
+    }
+    case "groq": {
       model = new GroqCloudAPI(
         profile.model.replace("groq/", "").replace("groqcloud/", ""),
         profile.url,
         profile.params,
       );
-    } else if (profile.api === "huggingface") {
+    
+    break;
+    }
+    case "huggingface": {
       model = new HuggingFace(profile.model, profile.url, profile.params);
-    } else if (profile.api === "novita") {
+    
+    break;
+    }
+    case "novita": {
       model = new Novita(
         profile.model.replace("novita/", ""),
         profile.url,
         profile.params,
       );
-    } else if (profile.api === "qwen") {
+    
+    break;
+    }
+    case "qwen": {
       model = new Qwen(profile.model, profile.url, profile.params);
-    } else if (profile.api === "xai") {
+    
+    break;
+    }
+    case "xai": {
       model = new Grok(profile.model, profile.url, profile.params);
-    } else if (profile.api === "deepseek") {
+    
+    break;
+    }
+    case "deepseek": {
       model = new DeepSeek(profile.model, profile.url, profile.params);
-    } else if (profile.api === "openrouter") {
+    
+    break;
+    }
+    case "openrouter": {
       model = new OpenRouter(
         profile.model.replace("openrouter/", ""),
         profile.url,
         profile.params,
       );
-    } else {
+    
+    break;
+    }
+    default: {
       throw new Error("Unknown API:", profile.api);
+    }
     }
     return model;
   }
@@ -252,7 +315,7 @@ export class Prompter {
       await Promise.all([
         this.convo_examples.load(this.profile.conversation_examples),
         this.coding_examples.load(this.profile.coding_examples),
-        this.skill_libary.initSkillLibrary(),
+        this.skill_library.initSkillLibrary(),
       ]).catch((error) => {
         // Preserve error details
         console.error("Failed to initialize examples. Error details:", error);
@@ -296,18 +359,17 @@ export class Prompter {
     }
     if (prompt.includes("$CODE_DOCS")) {
       const code_task_content =
-        messages
-          .slice()
+        [...messages]
           .reverse()
           .find(
-            (msg) =>
-              msg.role !== "system" && msg.content.includes("!newAction("),
+            (message) =>
+              message.role !== "system" && message.content.includes("!newAction("),
           )
           ?.content?.match(/!newAction\((.*?)\)/)?.[1] || "";
 
       prompt = prompt.replaceAll(
         "$CODE_DOCS",
-        await this.skill_libary.getRelevantSkillDocs(
+        await this.skill_library.getRelevantSkillDocs(
           code_task_content,
           settings.relevant_docs_count,
         ),
@@ -337,31 +399,25 @@ export class Prompter {
     }
     if (prompt.includes("$SELF_PROMPT")) {
       // if active or paused, show the current goal
-      let self_prompt = !this.agent.self_prompter.isStopped()
-        ? `YOUR CURRENT ASSIGNED GOAL: "${this.agent.self_prompter.prompt}"\n`
-        : "";
+      let self_prompt = this.agent.self_prompter.isStopped()
+        ? ""
+        : `YOUR CURRENT ASSIGNED GOAL: "${this.agent.self_prompter.prompt}"\n`;
       prompt = prompt.replaceAll("$SELF_PROMPT", self_prompt);
     }
     if (prompt.includes("$LAST_GOALS")) {
       let goal_text = "";
       for (let goal in last_goals) {
-        if (last_goals[goal]) {
-          goal_text += `You recently successfully completed the goal ${goal}.\n`;
-        } else {
-          goal_text += `You recently failed to complete the goal ${goal}.\n`;
-        }
+        goal_text += last_goals[goal] ? `You recently successfully completed the goal ${goal}.\n` : `You recently failed to complete the goal ${goal}.\n`;
       }
       prompt = prompt.replaceAll("$LAST_GOALS", goal_text.trim());
     }
-    if (prompt.includes("$BLUEPRINTS")) {
-      if (this.agent.npc.constructions) {
+    if (prompt.includes("$BLUEPRINTS") && this.agent.npc.constructions) {
         let blueprints = "";
         for (let blueprint in this.agent.npc.constructions) {
           blueprints += blueprint + ", ";
         }
         prompt = prompt.replaceAll("$BLUEPRINTS", blueprints.slice(0, -2));
       }
-    }
 
     // check if there are any remaining placeholders with syntax $<word>
     let remaining = prompt.match(/\$[A-Z_]+/g);
@@ -381,11 +437,11 @@ export class Prompter {
 
   async promptConvo(messages) {
     this.most_recent_msg_time = Date.now();
-    let current_msg_time = this.most_recent_msg_time;
-    for (let i = 0; i < 3; i++) {
+    let current_message_time = this.most_recent_msg_time;
+    for (let index = 0; index < 3; index++) {
       // try 3 times to avoid hallucinations
       await this.checkCooldown();
-      if (current_msg_time !== this.most_recent_msg_time) {
+      if (current_message_time !== this.most_recent_msg_time) {
         return "";
       }
       let prompt = this.profile.conversing;
@@ -399,7 +455,7 @@ export class Prompter {
         );
         continue;
       }
-      if (current_msg_time !== this.most_recent_msg_time) {
+      if (current_message_time !== this.most_recent_msg_time) {
         console.warn(
           this.agent.name +
             " received new message while generating, discarding old response.",
@@ -464,19 +520,19 @@ export class Prompter {
     try {
       let data = res.split("```")[1].replace("json", "").trim();
       goal = JSON.parse(data);
-    } catch (err) {
-      console.log("Failed to parse goal:", res, err);
+    } catch (error) {
+      console.log("Failed to parse goal:", res, error);
     }
     if (
       !goal ||
       !goal.name ||
       !goal.quantity ||
-      isNaN(parseInt(goal.quantity))
+      isNaN(Number.parseInt(goal.quantity))
     ) {
       console.log("Failed to set goal:", res);
       return null;
     }
-    goal.quantity = parseInt(goal.quantity);
+    goal.quantity = Number.parseInt(goal.quantity);
     return goal;
   }
 }

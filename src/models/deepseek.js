@@ -3,9 +3,9 @@ import { getKey, hasKey } from "../utils/keys.js";
 import { strictFormat } from "../utils/text.js";
 
 export class DeepSeek {
-  constructor(model_name, url, params) {
+  constructor(model_name, url, parameters) {
     this.model_name = model_name;
-    this.params = params;
+    this.params = parameters;
 
     let config = {};
 
@@ -24,7 +24,7 @@ export class DeepSeek {
       model: this.model_name || "deepseek-chat",
       messages,
       stop: stop_seq,
-      ...(this.params || {}),
+      ...this.params,
     };
 
     let res = null;
@@ -37,10 +37,10 @@ export class DeepSeek {
       }
       console.log("Received.");
       res = completion.choices[0].message.content;
-    } catch (err) {
+    } catch (error) {
       if (
-        (err.message == "Context length exceeded" ||
-          err.code == "context_length_exceeded") &&
+        (error.message == "Context length exceeded" ||
+          error.code == "context_length_exceeded") &&
         turns.length > 1
       ) {
         console.log(
@@ -48,7 +48,7 @@ export class DeepSeek {
         );
         return await this.sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
-        console.log(err);
+        console.log(error);
         res = "My brain disconnected, try again.";
       }
     }

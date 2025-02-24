@@ -12,7 +12,7 @@ import {
   blacklistCommands,
 } from "./commands/index.js";
 import { ActionManager } from "./action_manager.js";
-import { NPCContoller } from "./npc/controller.js";
+import { NPCController } from "./npc/controller.js";
 import { MemoryBank } from "./memory_bank.js";
 import { SelfPrompter } from "./self_prompter.js";
 import convoManager from "./conversation.js";
@@ -54,7 +54,7 @@ export class Agent {
       console.log("Initializing coder...");
       this.coder = new Coder(this);
       console.log("Initializing npc controller...");
-      this.npc = new NPCContoller(this);
+      this.npc = new NPCController(this);
       console.log("Initializing memory bank...");
       this.memory_bank = new MemoryBank();
       console.log("Initializing self prompter...");
@@ -96,7 +96,7 @@ export class Agent {
 
       const spawnTimeout = setTimeout(() => {
         process.exit(0);
-      }, 30000);
+      }, 30_000);
       this.bot.once("spawn", async () => {
         try {
           clearTimeout(spawnTimeout);
@@ -141,7 +141,7 @@ export class Agent {
       "Gamerule ",
     ];
 
-    const respondFunc = async (username, message) => {
+    const respondFunction = async (username, message) => {
       if (username === this.name) {
         return;
       }
@@ -171,11 +171,11 @@ export class Agent {
       }
     };
 
-    this.respondFunc = respondFunc;
+    this.respondFunc = respondFunction;
 
-    this.bot.on("whisper", respondFunc);
+    this.bot.on("whisper", respondFunction);
     if (settings.profiles.length === 1) {
-      this.bot.on("chat", respondFunc);
+      this.bot.on("chat", respondFunction);
     }
 
     // Set up auto-eat
@@ -203,11 +203,11 @@ export class Agent {
     if (save_data?.last_sender) {
       this.last_sender = save_data.last_sender;
       if (convoManager.otherAgentInGame(this.last_sender)) {
-        const msg_package = {
+        const message_package = {
           message: `You have restarted and this message is auto-generated. Continue the conversation with me.`,
           start: true,
         };
-        convoManager.receiveFromBot(this.last_sender, msg_package);
+        convoManager.receiveFromBot(this.last_sender, message_package);
       }
     } else if (init_message) {
       await this.handleMessage("system", init_message, 2);
@@ -267,7 +267,7 @@ export class Agent {
         }
         this.routeResponse(
           source,
-          `*${source} used ${user_command_name.substring(1)}*`,
+          `*${source} used ${user_command_name.slice(1)}*`,
         );
         if (user_command_name === "!newAction") {
           // all user-initiated commands are ignored by the bot except for this one
@@ -300,11 +300,11 @@ export class Agent {
       const MAX_LOG = 500;
       if (behavior_log.length > MAX_LOG) {
         behavior_log =
-          "..." + behavior_log.substring(behavior_log.length - MAX_LOG);
+          "..." + behavior_log.slice(Math.max(0, behavior_log.length - MAX_LOG));
       }
       behavior_log =
         "Recent behaviors log: \n" +
-        behavior_log.substring(behavior_log.indexOf("\n"));
+        behavior_log.slice(Math.max(0, behavior_log.indexOf("\n")));
       await this.history.add("system", behavior_log);
     }
 
@@ -316,7 +316,7 @@ export class Agent {
       // message is from user during self-prompting
       max_responses = 1;
     } // force only respond to this message, then let self-prompting take over
-    for (let i = 0; i < max_responses; i++) {
+    for (let index = 0; index < max_responses; index++) {
       if (checkInterrupt()) {
         break;
       }
@@ -355,8 +355,8 @@ export class Agent {
           this.routeResponse(source, res);
         } else {
           // only output command name
-          let pre_message = res.substring(0, res.indexOf(command_name)).trim();
-          let chat_message = `*used ${command_name.substring(1)}*`;
+          let pre_message = res.slice(0, Math.max(0, res.indexOf(command_name))).trim();
+          let chat_message = `*used ${command_name.slice(1)}*`;
           if (pre_message.length > 0) {
             chat_message = `${pre_message}  ${chat_message}`;
           }
@@ -417,8 +417,8 @@ export class Agent {
     let translate_up_to = command_name ? message.indexOf(command_name) : -1;
     if (translate_up_to != -1) {
       // don't translate the command
-      to_translate = to_translate.substring(0, translate_up_to);
-      remaining = message.substring(translate_up_to);
+      to_translate = to_translate.slice(0, Math.max(0, translate_up_to));
+      remaining = message.slice(Math.max(0, translate_up_to));
     }
     message = (await handleTranslation(to_translate)).trim() + " " + remaining;
     // newlines are interpreted as separate chats, which triggers spam filters. replace them with spaces
@@ -440,26 +440,26 @@ export class Agent {
         this.bot.emit("sunrise");
       } else if (this.bot.time.timeOfDay == 6000) {
         this.bot.emit("noon");
-      } else if (this.bot.time.timeOfDay == 12000) {
+      } else if (this.bot.time.timeOfDay == 12_000) {
         this.bot.emit("sunset");
-      } else if (this.bot.time.timeOfDay == 18000) {
+      } else if (this.bot.time.timeOfDay == 18_000) {
         this.bot.emit("midnight");
       }
     });
 
-    let prev_health = this.bot.health;
+    let previous_health = this.bot.health;
     this.bot.lastDamageTime = 0;
     this.bot.lastDamageTaken = 0;
     this.bot.on("health", () => {
-      if (this.bot.health < prev_health) {
+      if (this.bot.health < previous_health) {
         this.bot.lastDamageTime = Date.now();
-        this.bot.lastDamageTaken = prev_health - this.bot.health;
+        this.bot.lastDamageTaken = previous_health - this.bot.health;
       }
-      prev_health = this.bot.health;
+      previous_health = this.bot.health;
     });
     // Logging callbacks
-    this.bot.on("error", (err) => {
-      console.error("Error event!", err);
+    this.bot.on("error", (error) => {
+      console.error("Error event!", error);
     });
     this.bot.on("end", (reason) => {
       console.warn("Bot disconnected! Killing agent process.", reason);
@@ -473,13 +473,13 @@ export class Agent {
       console.warn("Bot kicked!", reason);
       this.cleanKill("Bot kicked! Killing agent process.");
     });
-    this.bot.on("messagestr", async (message, _, jsonMsg) => {
+    this.bot.on("messagestr", async (message, _, jsonMessage) => {
       if (
-        jsonMsg.translate &&
-        jsonMsg.translate.startsWith("death") &&
+        jsonMessage.translate &&
+        jsonMessage.translate.startsWith("death") &&
         message.startsWith(this.name)
       ) {
-        console.log("Agent died: ", message);
+        console.log("Agent died:", message);
         let death_pos = this.bot.entity.position;
         this.memory_bank.rememberPlace(
           "last_death_position",
@@ -491,10 +491,10 @@ export class Agent {
         if (death_pos) {
           death_pos_text = `x: ${death_pos.x.toFixed(2)}, y: ${death_pos.y.toFixed(2)}, z: ${death_pos.x.toFixed(2)}`;
         }
-        let dimention = this.bot.game.dimension;
+        let dimension = this.bot.game.dimension;
         this.handleMessage(
           "system",
-          `You died at position ${death_pos_text || "unknown"} in the ${dimention} dimension with the final message: '${message}'. Your place of death is saved as 'last_death_position' if you want to return. Previous actions were stopped and you have respawned.`,
+          `You died at position ${death_pos_text || "unknown"} in the ${dimension} dimension with the final message: '${message}'. Your place of death is saved as 'last_death_position' if you want to return. Previous actions were stopped and you have respawned.`,
         );
       }
     });
@@ -547,8 +547,8 @@ export class Agent {
     return !this.actions.executing && !this.coder.generating;
   }
 
-  cleanKill(msg = "Killing agent process...", code = 1) {
-    this.history.add("system", msg);
+  cleanKill(message = "Killing agent process...", code = 1) {
+    this.history.add("system", message);
     this.bot.chat(code > 1 ? "Restarting." : "Exiting.");
     this.history.save();
     process.exit(code);

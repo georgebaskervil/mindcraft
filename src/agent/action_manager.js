@@ -9,16 +9,12 @@ export class ActionManager {
     this.resume_name = "";
   }
 
-  async resumeAction(actionFn, timeout) {
-    return this._executeResume(actionFn, timeout);
+  async resumeAction(actionFunction, timeout) {
+    return this._executeResume(actionFunction, timeout);
   }
 
-  async runAction(actionLabel, actionFn, { timeout, resume = false } = {}) {
-    if (resume) {
-      return this._executeResume(actionLabel, actionFn, timeout);
-    } else {
-      return this._executeAction(actionLabel, actionFn, timeout);
-    }
+  async runAction(actionLabel, actionFunction, { timeout, resume = false } = {}) {
+    return resume ? this._executeResume(actionLabel, actionFunction, timeout) : this._executeAction(actionLabel, actionFunction, timeout);
   }
 
   async stop() {
@@ -29,7 +25,7 @@ export class ActionManager {
       this.agent.cleanKill(
         "Code execution refused stop after 10 seconds. Killing process.",
       );
-    }, 10000);
+    }, 10_000);
     while (this.executing) {
       this.agent.requestInterrupt();
       console.log("waiting for code to finish executing...");
@@ -43,16 +39,16 @@ export class ActionManager {
     this.resume_name = null;
   }
 
-  async _executeResume(actionLabel = null, actionFn = null, timeout = 10) {
-    const new_resume = actionFn != null;
+  async _executeResume(actionLabel = null, actionFunction = null, timeout = 10) {
+    const new_resume = actionFunction != undefined;
     if (new_resume) {
       // start new resume
-      this.resume_func = actionFn;
-      assert(actionLabel != null, "actionLabel is required for new resume");
+      this.resume_func = actionFunction;
+      assert(actionLabel != undefined, "actionLabel is required for new resume");
       this.resume_name = actionLabel;
     }
     if (
-      this.resume_func != null &&
+      this.resume_func != undefined &&
       (this.agent.isIdle() || new_resume) &&
       (!this.agent.self_prompter.isActive() || new_resume)
     ) {
@@ -74,7 +70,7 @@ export class ActionManager {
     }
   }
 
-  async _executeAction(actionLabel, actionFn, timeout = 10) {
+  async _executeAction(actionLabel, actionFunction, timeout = 10) {
     let TIMEOUT;
     try {
       console.log("executing code...\n");
@@ -93,7 +89,7 @@ export class ActionManager {
 
       this.executing = true;
       this.currentActionLabel = actionLabel;
-      this.currentActionFn = actionFn;
+      this.currentActionFn = actionFunction;
 
       // timeout in minutes
       if (timeout > 0) {
@@ -101,7 +97,7 @@ export class ActionManager {
       }
 
       // start the action
-      await actionFn();
+      await actionFunction();
 
       // mark action as finished + cleanup
       this.executing = false;
@@ -122,26 +118,26 @@ export class ActionManager {
 
       // return action status report
       return { success: true, message: output, interrupted, timedout };
-    } catch (err) {
+    } catch (error) {
       this.executing = false;
       this.currentActionLabel = "";
       this.currentActionFn = null;
       clearTimeout(TIMEOUT);
       this.cancelResume();
-      console.error("Code execution triggered catch:", err);
+      console.error("Code execution triggered catch:", error);
       // Log the full stack trace
-      console.error(err.stack);
+      console.error(error.stack);
       await this.stop();
-      err = err.toString();
+      error = error.toString();
 
       let message =
         this._getBotOutputSummary() +
         "!!Code threw exception!!\n" +
         "Error: " +
-        err +
+        error +
         "\n" +
         "Stack trace:\n" +
-        err.stack +
+        error.stack +
         "\n";
 
       let interrupted = this.agent.bot.interrupt_code;
@@ -160,12 +156,8 @@ export class ActionManager {
     }
     let output = bot.output;
     const MAX_OUT = 500;
-    if (output.length > MAX_OUT) {
-      output = `Code output is very long (${output.length} chars) and has been shortened.\n
-          First outputs:\n${output.substring(0, MAX_OUT / 2)}\n...skipping many lines.\nFinal outputs:\n ${output.substring(output.length - MAX_OUT / 2)}`;
-    } else {
-      output = "Code output:\n" + output.toString();
-    }
+    output = output.length > MAX_OUT ? `Code output is very long (${output.length} chars) and has been shortened.\n
+          First outputs:\n${output.slice(0, Math.max(0, MAX_OUT / 2))}\n...skipping many lines.\nFinal outputs:\n ${output.slice(Math.max(0, output.length - MAX_OUT / 2))}` : "Code output:\n" + output.toString();
     return output;
   }
 

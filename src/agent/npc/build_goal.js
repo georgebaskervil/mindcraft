@@ -9,11 +9,11 @@ export class BuildGoal {
     this.agent = agent;
   }
 
-  async wrapSkill(func) {
+  async wrapSkill(function_) {
     if (!this.agent.isIdle()) {
       return false;
     }
-    let res = await this.agent.actions.runAction("BuildGoal", func);
+    let res = await this.agent.actions.runAction("BuildGoal", function_);
     return !res.interrupted;
   }
 

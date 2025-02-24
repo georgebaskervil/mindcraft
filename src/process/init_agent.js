@@ -11,15 +11,15 @@ process.on("unhandledRejection", (reason, promise) => {
   process.exit(1);
 });
 
-const args = process.argv.slice(2);
-if (args.length < 1) {
+const arguments_ = process.argv.slice(2);
+if (arguments_.length === 0) {
   console.log(
     "Usage: node init_agent.js <agent_name> [profile] [load_memory] [init_message]",
   );
   process.exit(1);
 }
 
-const argv = yargs(args)
+const argv = yargs(arguments_)
   .option("profile", {
     alias: "p",
     type: "string",

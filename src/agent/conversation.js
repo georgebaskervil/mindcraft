@@ -1,5 +1,5 @@
 import settings from "../../settings.js";
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 import { containsCommand } from "./commands/index.js";
 import { sendBotChatToServer } from "./agent_proxy.js";
 
@@ -46,7 +46,7 @@ class Conversation {
   }
 }
 
-const WAIT_TIME_START = 30000;
+const WAIT_TIME_START = 30_000;
 class ConversationManager {
   constructor() {
     this.convos = {};
@@ -102,16 +102,16 @@ class ConversationManager {
             this._clearMonitorTimeouts();
             return;
           }
-          if (!agent.self_prompter.isPaused()) {
+          if (agent.self_prompter.isPaused()) {
+            this.endConversation(convo_partner);
+          } else {
             this.endConversation(convo_partner);
             agent.handleMessage(
               "system",
               `${convo_partner} disconnected, conversation has ended.`,
             );
-          } else {
-            this.endConversation(convo_partner);
           }
-        }, 10000);
+        }, 10_000);
       }
     }, 1000);
   }
@@ -224,11 +224,11 @@ class ConversationManager {
   }
 
   isOtherAgent(name) {
-    return agent_names.some((n) => n === name);
+    return agent_names.includes(name);
   }
 
   otherAgentInGame(name) {
-    return agents_in_game.some((n) => n === name);
+    return agents_in_game.includes(name);
   }
 
   updateAgents(agents) {
@@ -322,7 +322,10 @@ async function _scheduleProcessInMessage(sender, received, convo) {
   } else if (otherAgentBusy) {
     // other bot is busy but I'm not
     scheduleResponse(longDelay);
-  } else if (!agent.isIdle()) {
+  } else if (agent.isIdle()) {
+    // neither are busy
+    scheduleResponse(fastDelay);
+  } else {
     // I'm busy but other bot isn't
     let canTalkOver = talkOverActions.some((a) =>
       agent.actions.currentActionLabel.includes(a),
@@ -340,9 +343,6 @@ async function _scheduleProcessInMessage(sender, received, convo) {
         scheduleResponse(fastDelay);
       }
     }
-  } else {
-    // neither are busy
-    scheduleResponse(fastDelay);
   }
 }
 

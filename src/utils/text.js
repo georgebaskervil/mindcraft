@@ -20,13 +20,13 @@ export function toSinglePrompt(
 ) {
   let prompt = system ? `${system}${stop_seq}` : "";
   let role = "";
-  turns.forEach((message) => {
+  for (const message of turns) {
     role = message.role;
     if (role === "assistant") {
       role = model_nickname;
     }
     prompt += `${role}: ${message.content}${stop_seq}`;
-  });
+  }
   if (role !== model_nickname) {
     // if the last message was from the user/system, add a prompt for the model. otherwise, pretend we are extending the model's own message
     prompt += model_nickname + ": ";
@@ -36,7 +36,7 @@ export function toSinglePrompt(
 
 function _getWords(text) {
   return text
-    .replace(/[^a-zA-Z ]/g, "")
+    .replaceAll(/[^a-zA-Z ]/g, "")
     .toLowerCase()
     .split(" ");
 }
@@ -55,26 +55,25 @@ export function wordOverlapScore(text1, text2) {
 // - combines repeated messages from users
 // - separates repeat assistant messages with filler user messages
 export function strictFormat(turns) {
-  let prev_role = null;
+  let previous_role = null;
   let messages = [];
   let filler = { role: "user", content: "_" };
-  for (let msg of turns) {
-    msg.content = msg.content.trim();
-    if (msg.role === "system") {
-      msg.role = "user";
-      msg.content = "SYSTEM: " + msg.content;
+  for (let message of turns) {
+    message.content = message.content.trim();
+    if (message.role === "system") {
+      message.role = "user";
+      message.content = "SYSTEM: " + message.content;
     }
-    if (msg.role === prev_role && msg.role === "assistant") {
+    if (message.role === previous_role && message.role === "assistant") {
       // insert empty user message to separate assistant messages
-      messages.push(filler);
-      messages.push(msg);
-    } else if (msg.role === prev_role) {
+      messages.push(filler, message);
+    } else if (message.role === previous_role) {
       // combine new message with previous message instead of adding a new one
-      messages[messages.length - 1].content += "\n" + msg.content;
+      messages.at(-1).content += "\n" + message.content;
     } else {
-      messages.push(msg);
+      messages.push(message);
     }
-    prev_role = msg.role;
+    previous_role = message.role;
   }
   if (messages.length > 0 && messages[0].role !== "user") {
     messages.unshift(filler); // anthropic requires user message to start

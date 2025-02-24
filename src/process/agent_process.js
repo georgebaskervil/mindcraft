@@ -1,4 +1,4 @@
-import { spawn } from "child_process";
+import { spawn } from "node:child_process";
 import { mainProxy } from "./main_proxy.js";
 
 export class AgentProcess {
@@ -14,23 +14,22 @@ export class AgentProcess {
     this.count_id = count_id;
     this.running = true;
 
-    let args = ["src/process/init_agent.js", this.name];
-    args.push("-p", profile);
-    args.push("-c", count_id);
+    let arguments_ = ["src/process/init_agent.js", this.name];
+    arguments_.push("-p", profile, "-c", count_id);
     if (load_memory) {
-      args.push("-l", load_memory);
+      arguments_.push("-l", load_memory);
     }
     if (init_message) {
-      args.push("-m", init_message);
+      arguments_.push("-m", init_message);
     }
     if (task_path) {
-      args.push("-t", task_path);
+      arguments_.push("-t", task_path);
     }
     if (task_id) {
-      args.push("-i", task_id);
+      arguments_.push("-i", task_id);
     }
 
-    const agentProcess = spawn("node", args, {
+    const agentProcess = spawn("node", arguments_, {
       stdio: "inherit",
       stderr: "inherit",
     });
@@ -50,7 +49,7 @@ export class AgentProcess {
 
       if (code !== 0 && signal !== "SIGINT") {
         // agent must run for at least 10 seconds before restarting
-        if (Date.now() - last_restart < 10000) {
+        if (Date.now() - last_restart < 10_000) {
           console.error(
             `Agent process ${profile} exited too quickly and will not be restarted.`,
           );
@@ -69,8 +68,8 @@ export class AgentProcess {
       }
     });
 
-    agentProcess.on("error", (err) => {
-      console.error("Agent process error:", err);
+    agentProcess.on("error", (error) => {
+      console.error("Agent process error:", error);
     });
 
     this.process = agentProcess;

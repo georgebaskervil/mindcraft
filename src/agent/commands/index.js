@@ -15,9 +15,9 @@ export function getCommand(name) {
 }
 
 export function blacklistCommands(commands) {
-  const unblockable = ["!stop", "!stats", "!inventory", "!goal"];
+  const unblockable = new Set(["!stop", "!stats", "!inventory", "!goal"]);
   for (let command_name of commands) {
-    if (unblockable.includes(command_name)) {
+    if (unblockable.has(command_name)) {
       console.warn(`Command ${command_name} is unblockable`);
       continue;
     }
@@ -28,7 +28,7 @@ export function blacklistCommands(commands) {
 
 const commandRegex =
   /!(\w+)(?:\(((?:-?\d+(?:\.\d+)?|true|false|"[^"]*")(?:\s*,\s*(?:-?\d+(?:\.\d+)?|true|false|"[^"]*"))*)\))?/;
-const argRegex = /-?\d+(?:\.\d+)?|true|false|"[^"]*"/g;
+const argumentRegex = /-?\d+(?:\.\d+)?|true|false|"[^"]*"/g;
 
 export function containsCommand(message) {
   const commandMatch = message.match(commandRegex);
@@ -55,15 +55,18 @@ function parseBoolean(input) {
     case "false": //These are interpreted as flase;
     case "f":
     case "0":
-    case "off":
+    case "off": {
       return false;
+    }
     case "true": //These are interpreted as true;
     case "t":
     case "1":
-    case "on":
+    case "on": {
       return true;
-    default:
+    }
+    default: {
       return null;
+    }
   }
 }
 
@@ -75,22 +78,27 @@ function parseBoolean(input) {
  */
 function checkInInterval(number, lowerBound, upperBound, endpointType) {
   switch (endpointType) {
-    case "[)":
+    case "[)": {
       return lowerBound <= number && number < upperBound;
-    case "()":
+    }
+    case "()": {
       return lowerBound < number && number < upperBound;
-    case "(]":
+    }
+    case "(]": {
       return lowerBound < number && number <= upperBound;
-    case "[]":
+    }
+    case "[]": {
       return lowerBound <= number && number <= upperBound;
-    default:
+    }
+    default: {
       throw new Error("Unknown endpoint type:", endpointType);
+    }
   }
 }
 
 // todo: handle arrays?
 /**
- * Returns an object containing the command, the command name, and the comand parameters.
+ * Returns an object containing the command, the command name, and the command parameters.
  * If parsing unsuccessful, returns an error message as a string.
  * @param {string} message - A message from a player or language model containing a command.
  * @returns {string | Object}
@@ -103,66 +111,68 @@ export function parseCommandMessage(message) {
 
   const commandName = "!" + commandMatch[1];
 
-  let args;
-  if (commandMatch[2]) {
-    args = commandMatch[2].match(argRegex);
-  } else {
-    args = [];
-  }
+  let arguments_;
+  arguments_ = commandMatch[2] ? commandMatch[2].match(argumentRegex) : [];
 
   const command = getCommand(commandName);
   if (!command) {
     return `${commandName} is not a command.`;
   }
 
-  const params = commandParams(command);
-  const paramNames = commandParamNames(command);
+  const parameters = commandParameters(command);
+  const parameterNames = commandParameterNames(command);
 
-  if (args.length !== params.length) {
-    return `Command ${command.name} was given ${args.length} args, but requires ${params.length} args.`;
+  if (arguments_.length !== parameters.length) {
+    return `Command ${command.name} was given ${arguments_.length} args, but requires ${parameters.length} args.`;
   }
 
-  for (let i = 0; i < args.length; i++) {
-    const param = params[i];
+  for (let index = 0; index < arguments_.length; index++) {
+    const parameter = parameters[index];
     //Remove any extra characters
-    let arg = args[i].trim();
+    let argument = arguments_[index].trim();
     if (
-      (arg.startsWith('"') && arg.endsWith('"')) ||
-      (arg.startsWith("'") && arg.endsWith("'"))
+      (argument.startsWith('"') && argument.endsWith('"')) ||
+      (argument.startsWith("'") && argument.endsWith("'"))
     ) {
-      arg = arg.substring(1, arg.length - 1);
+      argument = argument.substring(1, argument.length - 1);
     }
 
     //Convert to the correct type
-    switch (param.type) {
-      case "int":
-        arg = Number.parseInt(arg);
+    switch (parameter.type) {
+      case "int": {
+        argument = Number.parseInt(argument);
         break;
-      case "float":
-        arg = Number.parseFloat(arg);
+      }
+      case "float": {
+        argument = Number.parseFloat(argument);
         break;
-      case "boolean":
-        arg = parseBoolean(arg);
+      }
+      case "boolean": {
+        argument = parseBoolean(argument);
         break;
+      }
       case "BlockName":
-      case "ItemName":
-        if (arg.endsWith("plank")) {
-          arg += "s";
-        } // catches common mistakes like "oak_plank" instead of "oak_planks"
-      case "string":
+      case "ItemName": {
+        if (argument.endsWith("plank")) {
+          argument += "s";
+        }
+      } // catches common mistakes like "oak_plank" instead of "oak_planks"
+      case "string": {
         break;
-      default:
+      }
+      default: {
         throw new Error(
-          `Command '${commandName}' parameter '${paramNames[i]}' has an unknown type: ${param.type}`,
+          `Command '${commandName}' parameter '${parameterNames[index]}' has an unknown type: ${parameter.type}`,
         );
+      }
     }
-    if (arg === null || Number.isNaN(arg)) {
-      return `Error: Param '${paramNames[i]}' must be of type ${param.type}.`;
+    if (argument === null || Number.isNaN(argument)) {
+      return `Error: Param '${parameterNames[index]}' must be of type ${parameter.type}.`;
     }
 
-    if (typeof arg === "number") {
+    if (typeof argument === "number") {
       //Check the domain of numbers
-      const domain = param.domain;
+      const domain = parameter.domain;
       if (domain) {
         /**
          * Javascript has a built in object for sets but not intervals.
@@ -172,37 +182,35 @@ export function parseCommandMessage(message) {
           domain[2] = "[)";
         } //By default, lower bound is included. Upper is not.
 
-        if (!checkInInterval(arg, ...domain)) {
-          return `Error: Param '${paramNames[i]}' must be an element of ${domain[2][0]}${domain[0]}, ${domain[1]}${domain[2][1]}.`;
+        if (!checkInInterval(argument, ...domain)) {
+          return `Error: Param '${parameterNames[index]}' must be an element of ${domain[2][0]}${domain[0]}, ${domain[1]}${domain[2][1]}.`;
           //Alternatively arg could be set to the nearest value in the domain.
         }
       } else if (!suppressNoDomainWarning) {
         console.warn(
-          `Command '${commandName}' parameter '${paramNames[i]}' has no domain set. Expect any value [-Infinity, Infinity].`,
+          `Command '${commandName}' parameter '${parameterNames[index]}' has no domain set. Expect any value [-Infinity, Infinity].`,
         );
         suppressNoDomainWarning = true; //Don't spam console. Only give the warning once.
       }
-    } else if (param.type === "BlockName") {
+    } else if (parameter.type === "BlockName") {
       //Check that there is a block with this name
-      if (getBlockId(arg) == null && arg !== "air") {
-        return `Invalid block type: ${arg}.`;
+      if (getBlockId(argument) == undefined && argument !== "air") {
+        return `Invalid block type: ${argument}.`;
       }
-    } else if (param.type === "ItemName") {
-      //Check that there is an item with this name
-      if (getItemId(arg) == null) {
-        return `Invalid item type: ${arg}.`;
+    } else if (parameter.type === "ItemName" && //Check that there is an item with this name
+      getItemId(argument) == undefined) {
+        return `Invalid item type: ${argument}.`;
       }
-    }
-    args[i] = arg;
+    arguments_[index] = argument;
   }
 
-  return { commandName, args };
+  return { commandName, args: arguments_ };
 }
 
 export function truncCommandMessage(message) {
   const commandMatch = message.match(commandRegex);
   if (commandMatch) {
-    return message.substring(0, commandMatch.index + commandMatch[0].length);
+    return message.slice(0, Math.max(0, commandMatch.index + commandMatch[0].length));
   }
   return message;
 }
@@ -215,7 +223,7 @@ export function isAction(name) {
  * @param {Object} command
  * @returns {Object[]} The command's parameters.
  */
-function commandParams(command) {
+function commandParameters(command) {
   if (!command.params) {
     return [];
   }
@@ -226,15 +234,15 @@ function commandParams(command) {
  * @param {Object} command
  * @returns {string[]} The names of the command's parameters.
  */
-function commandParamNames(command) {
+function commandParameterNames(command) {
   if (!command.params) {
     return [];
   }
   return Object.keys(command.params);
 }
 
-function numParams(command) {
-  return commandParams(command).length;
+function numberParameters(command) {
+  return commandParameters(command).length;
 }
 
 export async function executeCommand(agent, message) {
@@ -245,15 +253,15 @@ export async function executeCommand(agent, message) {
   else {
     console.log("parsed command:", parsed);
     const command = getCommand(parsed.commandName);
-    let numArgs = 0;
+    let numberArguments = 0;
     if (parsed.args) {
-      numArgs = parsed.args.length;
+      numberArguments = parsed.args.length;
     }
-    if (numArgs !== numParams(command)) {
-      return `Command ${command.name} was given ${numArgs} args, but requires ${numParams(command)} args.`;
-    } else {
+    if (numberArguments === numberParameters(command)) {
       const result = await command.perform(agent, ...parsed.args);
       return result;
+    } else {
+      return `Command ${command.name} was given ${numberArguments} args, but requires ${numberParameters(command)} args.`;
     }
   }
 }
@@ -275,8 +283,8 @@ export function getCommandDocs() {
     docs += command.name + ": " + command.description + "\n";
     if (command.params) {
       docs += "Params:\n";
-      for (let param in command.params) {
-        docs += `${param}: (${typeTranslations[command.params[param].type] ?? command.params[param].type}) ${command.params[param].description}\n`;
+      for (let parameter in command.params) {
+        docs += `${parameter}: (${typeTranslations[command.params[parameter].type] ?? command.params[parameter].type}) ${command.params[parameter].description}\n`;
       }
     }
   }
