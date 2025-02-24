@@ -14,7 +14,9 @@ export class Examples {
     for (let turn of turns) {
       if (turn.role !== "assistant") {
         messages +=
-          turn.content.slice(Math.max(0, turn.content.indexOf(":") + 1)).trim() + "\n";
+          turn.content
+            .slice(Math.max(0, turn.content.indexOf(":") + 1))
+            .trim() + "\n";
       }
     }
     return messages.trim();

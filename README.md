@@ -92,7 +92,7 @@ When running in docker, if you want the bot to join your local minecraft server,
 
 To connect to an unsupported minecraft version, you can try to use [viaproxy](services/viaproxy/README.md)
 
-# Bot Profiles
+## Bot Profiles
 
 Bot profiles are json files (such as `andy.json`) that define:
 
@@ -150,11 +150,15 @@ Some of the node modules that we depend on have bugs in them. To add a patch, ch
 
 ## Citation
 
-```
+```bibtex
 @misc{mindcraft2023,
     Author = {Kolby Nottingham and Max Robinson},
     Title = {MINDcraft: LLM Agents for cooperation, competition, and creativity in Minecraft},
     Year = {2023},
     url={https://github.com/kolbytn/mindcraft}
 }
+```
+
+```
+
 ```

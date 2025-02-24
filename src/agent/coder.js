@@ -93,7 +93,10 @@ export class Coder {
     for (let line of code.split("\n")) {
       source += `    ${line}\n`;
     }
-    let source_lint_copy = this.code_lint_template.replace("/* CODE HERE */", source);
+    let source_lint_copy = this.code_lint_template.replace(
+      "/* CODE HERE */",
+      source,
+    );
     source = this.code_template.replace("/* CODE HERE */", source);
 
     let filename = this.file_counter + ".js";
@@ -282,13 +285,16 @@ export class Coder {
         };
       }
 
-      messages.push({
-        role: "assistant",
-        content: res,
-      }, {
-        role: "system",
-        content: code_return.message + "\nCode failed. Please try again:",
-      });
+      messages.push(
+        {
+          role: "assistant",
+          content: res,
+        },
+        {
+          role: "system",
+          content: code_return.message + "\nCode failed. Please try again:",
+        },
+      );
     }
     return {
       success: false,

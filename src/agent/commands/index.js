@@ -52,7 +52,7 @@ export function commandExists(commandName) {
  * */
 function parseBoolean(input) {
   switch (input.toLowerCase()) {
-    case "false": //These are interpreted as flase;
+    case "false": //These are interpreted as false;
     case "f":
     case "0":
     case "off": {
@@ -197,10 +197,12 @@ export function parseCommandMessage(message) {
       if (getBlockId(argument) == undefined && argument !== "air") {
         return `Invalid block type: ${argument}.`;
       }
-    } else if (parameter.type === "ItemName" && //Check that there is an item with this name
-      getItemId(argument) == undefined) {
-        return `Invalid item type: ${argument}.`;
-      }
+    } else if (
+      parameter.type === "ItemName" && //Check that there is an item with this name
+      getItemId(argument) == undefined
+    ) {
+      return `Invalid item type: ${argument}.`;
+    }
     arguments_[index] = argument;
   }
 
@@ -210,7 +212,10 @@ export function parseCommandMessage(message) {
 export function truncCommandMessage(message) {
   const commandMatch = message.match(commandRegex);
   if (commandMatch) {
-    return message.slice(0, Math.max(0, commandMatch.index + commandMatch[0].length));
+    return message.slice(
+      0,
+      Math.max(0, commandMatch.index + commandMatch[0].length),
+    );
   }
   return message;
 }

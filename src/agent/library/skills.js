@@ -513,7 +513,12 @@ export async function defendSelf(bot, range = 9) {
   return attacked;
 }
 
-export async function collectBlock(bot, blockType, number_ = 1, exclude = null) {
+export async function collectBlock(
+  bot,
+  blockType,
+  number_ = 1,
+  exclude = null,
+) {
   /**
    * Collect one of the given block type.
    * @param {MinecraftBot} bot, reference to the minecraft bot.
@@ -727,7 +732,11 @@ export async function placeBlock(
     return false;
   }
 
-  const target_destination = new Vec3(Math.floor(x), Math.floor(y), Math.floor(z));
+  const target_destination = new Vec3(
+    Math.floor(x),
+    Math.floor(y),
+    Math.floor(z),
+  );
   if (bot.modes.isOn("cheat") && !dontCheat) {
     if (bot.restrict_to_inventory) {
       let block = bot.inventory.items().find((item) => item.name === blockType);
@@ -886,7 +895,9 @@ export async function placeBlock(
   } else {
     directories.push(dir_map[placeOn]);
   }
-  directories.push(...Object.values(dir_map).filter((d) => !directories.includes(d)));
+  directories.push(
+    ...Object.values(dir_map).filter((d) => !directories.includes(d)),
+  );
 
   for (let d of directories) {
     const block = bot.blockAt(target_destination.plus(d));

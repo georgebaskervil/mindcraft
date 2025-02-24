@@ -48,8 +48,8 @@ export class History {
       const string_timestamp = new Date()
         .toLocaleString()
         .replaceAll(/[/:]/g, "-")
-        .replaceAll(' ', "")
-        .replaceAll(',', "_");
+        .replaceAll(" ", "")
+        .replaceAll(",", "_");
       this.full_history_fp = `./bots/${this.name}/histories/${string_timestamp}.json`;
       writeFileSync(this.full_history_fp, "[]", "utf8");
     }

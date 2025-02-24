@@ -30,7 +30,9 @@ export function createMindServer(port = 8080) {
 
     socket.on("register-agents", (agentNames) => {
       console.log(`Registering agents: ${agentNames}`);
-      for (const name of agentNames) {registeredAgents.add(name);}
+      for (const name of agentNames) {
+        registeredAgents.add(name);
+      }
       for (let name of agentNames) {
         agentManagers[name] = socket;
       }
@@ -40,7 +42,9 @@ export function createMindServer(port = 8080) {
 
     socket.on("login-agent", (agentName) => {
       if (currentAgentName && currentAgentName !== agentName) {
-        console.warn(`Agent ${agentName} already logged in as ${currentAgentName}`);
+        console.warn(
+          `Agent ${agentName} already logged in as ${currentAgentName}`,
+        );
         return;
       }
       if (registeredAgents.has(agentName)) {

@@ -54,13 +54,21 @@ export class SkillLibrary {
       skill_document_similarities = Object.keys(this.skill_docs)
         .map((document_key) => ({
           doc_key: document_key,
-          similarity_score: wordOverlapScore(message, this.skill_docs[document_key]),
+          similarity_score: wordOverlapScore(
+            message,
+            this.skill_docs[document_key],
+          ),
         }))
         .sort((a, b) => b.similarity_score - a.similarity_score);
     }
 
     let length = skill_document_similarities.length;
-    select_number = typeof select_number !== "number" || isNaN(select_number) || select_number < 0 ? length : Math.min(Math.floor(select_number), length);
+    select_number =
+      typeof select_number !== "number" ||
+      isNaN(select_number) ||
+      select_number < 0
+        ? length
+        : Math.min(Math.floor(select_number), length);
     let selected_docs = skill_document_similarities.slice(0, select_number);
     let relevant_skill_docs =
       "#### RELEVANT DOCS INFO ###\nThe following functions are listed in descending order of relevance.\n";

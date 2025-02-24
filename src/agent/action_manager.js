@@ -13,8 +13,14 @@ export class ActionManager {
     return this._executeResume(actionFunction, timeout);
   }
 
-  async runAction(actionLabel, actionFunction, { timeout, resume = false } = {}) {
-    return resume ? this._executeResume(actionLabel, actionFunction, timeout) : this._executeAction(actionLabel, actionFunction, timeout);
+  async runAction(
+    actionLabel,
+    actionFunction,
+    { timeout, resume = false } = {},
+  ) {
+    return resume
+      ? this._executeResume(actionLabel, actionFunction, timeout)
+      : this._executeAction(actionLabel, actionFunction, timeout);
   }
 
   async stop() {
@@ -39,12 +45,19 @@ export class ActionManager {
     this.resume_name = null;
   }
 
-  async _executeResume(actionLabel = null, actionFunction = null, timeout = 10) {
+  async _executeResume(
+    actionLabel = null,
+    actionFunction = null,
+    timeout = 10,
+  ) {
     const new_resume = actionFunction != undefined;
     if (new_resume) {
       // start new resume
       this.resume_func = actionFunction;
-      assert(actionLabel != undefined, "actionLabel is required for new resume");
+      assert(
+        actionLabel != undefined,
+        "actionLabel is required for new resume",
+      );
       this.resume_name = actionLabel;
     }
     if (
@@ -156,8 +169,11 @@ export class ActionManager {
     }
     let output = bot.output;
     const MAX_OUT = 500;
-    output = output.length > MAX_OUT ? `Code output is very long (${output.length} chars) and has been shortened.\n
-          First outputs:\n${output.slice(0, Math.max(0, MAX_OUT / 2))}\n...skipping many lines.\nFinal outputs:\n ${output.slice(Math.max(0, output.length - MAX_OUT / 2))}` : "Code output:\n" + output.toString();
+    output =
+      output.length > MAX_OUT
+        ? `Code output is very long (${output.length} chars) and has been shortened.\n
+          First outputs:\n${output.slice(0, Math.max(0, MAX_OUT / 2))}\n...skipping many lines.\nFinal outputs:\n ${output.slice(Math.max(0, output.length - MAX_OUT / 2))}`
+        : "Code output:\n" + output.toString();
     return output;
   }
 

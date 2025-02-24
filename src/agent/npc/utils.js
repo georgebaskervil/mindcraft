@@ -95,27 +95,32 @@ export function itemSatisfied(bot, item, quantity = 1) {
     let material = item.split("_")[0];
     let type = item.split("_")[1];
     switch (material) {
-    case "wooden": {
-      qualifying.push("stone_" + type, "iron_" + type, "gold_" + type, "diamond_" + type);
-    
-    break;
-    }
-    case "stone": {
-      qualifying.push("iron_" + type, "gold_" + type, "diamond_" + type);
-    
-    break;
-    }
-    case "iron": {
-      qualifying.push("gold_" + type, "diamond_" + type);
-    
-    break;
-    }
-    case "gold": {
-      qualifying.push("diamond_" + type);
-    
-    break;
-    }
-    // No default
+      case "wooden": {
+        qualifying.push(
+          "stone_" + type,
+          "iron_" + type,
+          "gold_" + type,
+          "diamond_" + type,
+        );
+
+        break;
+      }
+      case "stone": {
+        qualifying.push("iron_" + type, "gold_" + type, "diamond_" + type);
+
+        break;
+      }
+      case "iron": {
+        qualifying.push("gold_" + type, "diamond_" + type);
+
+        break;
+      }
+      case "gold": {
+        qualifying.push("diamond_" + type);
+
+        break;
+      }
+      // No default
     }
   }
   for (let item of qualifying) {

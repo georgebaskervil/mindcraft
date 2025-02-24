@@ -52,7 +52,7 @@ export class Grok {
       }
     }
     // sometimes outputs special token <|separator|>, just replace it
-    return res.replaceAll('<|separator|>', "*no response*");
+    return res.replaceAll("<|separator|>", "*no response*");
   }
 
   async embed(text) {

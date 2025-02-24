@@ -182,43 +182,46 @@ class ItemNode {
     let inventory = world.getInventoryCounts(this.manager.agent.bot);
     let init_quantity = inventory[this.name] || 0;
     switch (this.type) {
-    case "block": {
-      await skills.collectBlock(
-        this.manager.agent.bot,
-        this.source,
-        quantity,
-        this.manager.agent.npc.getBuiltPositions(),
-      );
-    
-    break;
-    }
-    case "smelt": {
-      let to_smelt_name = this.recipe[0].node.name;
-      let to_smelt_quantity = Math.min(quantity, inventory[to_smelt_name] || 1);
-      await skills.smeltItem(
-        this.manager.agent.bot,
-        to_smelt_name,
-        to_smelt_quantity,
-      );
-    
-    break;
-    }
-    case "hunt": {
-      for (let index = 0; index < quantity; index++) {
-        res = await skills.attackNearest(this.manager.agent.bot, this.source);
-        if (!res || this.manager.agent.bot.interrupt_code) {
-          break;
-        }
+      case "block": {
+        await skills.collectBlock(
+          this.manager.agent.bot,
+          this.source,
+          quantity,
+          this.manager.agent.npc.getBuiltPositions(),
+        );
+
+        break;
       }
-    
-    break;
-    }
-    case "craft": {
-      await skills.craftRecipe(this.manager.agent.bot, this.name, quantity);
-    
-    break;
-    }
-    // No default
+      case "smelt": {
+        let to_smelt_name = this.recipe[0].node.name;
+        let to_smelt_quantity = Math.min(
+          quantity,
+          inventory[to_smelt_name] || 1,
+        );
+        await skills.smeltItem(
+          this.manager.agent.bot,
+          to_smelt_name,
+          to_smelt_quantity,
+        );
+
+        break;
+      }
+      case "hunt": {
+        for (let index = 0; index < quantity; index++) {
+          res = await skills.attackNearest(this.manager.agent.bot, this.source);
+          if (!res || this.manager.agent.bot.interrupt_code) {
+            break;
+          }
+        }
+
+        break;
+      }
+      case "craft": {
+        await skills.craftRecipe(this.manager.agent.bot, this.name, quantity);
+
+        break;
+      }
+      // No default
     }
     let final_quantity =
       world.getInventoryCounts(this.manager.agent.bot)[this.name] || 0;

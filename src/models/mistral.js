@@ -24,7 +24,9 @@ export class Mistral {
     });
 
     // Prevents the following code from running when model not specified
-    if (this.model_name === undefined) {return;}
+    if (this.model_name === undefined) {
+      return;
+    }
 
     // get the model name without the "mistral" or "mistralai" prefix
     // e.g "mistral/mistral-large-latest" -> "mistral-large-latest"

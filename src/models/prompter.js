@@ -71,7 +71,10 @@ export class Prompter {
 
     let embedding = this.profile.embedding;
     if (embedding === undefined) {
-      embedding = chat_model_profile.api === "ollama" ? { api: "none" } : { api: chat_model_profile.api };
+      embedding =
+        chat_model_profile.api === "ollama"
+          ? { api: "none" }
+          : { api: chat_model_profile.api };
     } else if (typeof embedding === "string" || embedding instanceof String) {
       embedding = { api: embedding };
     }
@@ -80,55 +83,61 @@ export class Prompter {
 
     try {
       switch (embedding.api) {
-      case "google": {
-        this.embedding_model = new Gemini(embedding.model, embedding.url);
-      
-      break;
-      }
-      case "openai": {
-        this.embedding_model = new GPT(embedding.model, embedding.url);
-      
-      break;
-      }
-      case "replicate": {
-        this.embedding_model = new ReplicateAPI(embedding.model, embedding.url);
-      
-      break;
-      }
-      case "ollama": {
-        this.embedding_model = new Local(embedding.model, embedding.url);
-      
-      break;
-      }
-      case "qwen": {
-        this.embedding_model = new Qwen(embedding.model, embedding.url);
-      
-      break;
-      }
-      case "mistral": {
-        this.embedding_model = new Mistral(embedding.model, embedding.url);
-      
-      break;
-      }
-      case "huggingface": {
-        this.embedding_model = new HuggingFace(embedding.model, embedding.url);
-      
-      break;
-      }
-      case "novita": {
-        this.embedding_model = new Novita(embedding.model, embedding.url);
-      
-      break;
-      }
-      default: {
-        this.embedding_model = null;
-        let embedding_name = embedding ? embedding.api : "[NOT SPECIFIED]";
-        console.warn(
-          "Unsupported embedding: " +
-            embedding_name +
-            ". Using word-overlap instead, expect reduced performance. Recommend using a supported embedding model. See Readme.",
-        );
-      }
+        case "google": {
+          this.embedding_model = new Gemini(embedding.model, embedding.url);
+
+          break;
+        }
+        case "openai": {
+          this.embedding_model = new GPT(embedding.model, embedding.url);
+
+          break;
+        }
+        case "replicate": {
+          this.embedding_model = new ReplicateAPI(
+            embedding.model,
+            embedding.url,
+          );
+
+          break;
+        }
+        case "ollama": {
+          this.embedding_model = new Local(embedding.model, embedding.url);
+
+          break;
+        }
+        case "qwen": {
+          this.embedding_model = new Qwen(embedding.model, embedding.url);
+
+          break;
+        }
+        case "mistral": {
+          this.embedding_model = new Mistral(embedding.model, embedding.url);
+
+          break;
+        }
+        case "huggingface": {
+          this.embedding_model = new HuggingFace(
+            embedding.model,
+            embedding.url,
+          );
+
+          break;
+        }
+        case "novita": {
+          this.embedding_model = new Novita(embedding.model, embedding.url);
+
+          break;
+        }
+        default: {
+          this.embedding_model = null;
+          let embedding_name = embedding ? embedding.api : "[NOT SPECIFIED]";
+          console.warn(
+            "Unsupported embedding: " +
+              embedding_name +
+              ". Using word-overlap instead, expect reduced performance. Recommend using a supported embedding model. See Readme.",
+          );
+        }
       }
     } catch (error) {
       console.warn(
@@ -204,90 +213,90 @@ export class Prompter {
   _createModel(profile) {
     let model = null;
     switch (profile.api) {
-    case "google": {
-      model = new Gemini(profile.model, profile.url, profile.params);
-    
-    break;
-    }
-    case "openai": {
-      model = new GPT(profile.model, profile.url, profile.params);
-    
-    break;
-    }
-    case "anthropic": {
-      model = new Claude(profile.model, profile.url, profile.params);
-    
-    break;
-    }
-    case "replicate": {
-      model = new ReplicateAPI(
-        profile.model.replace("replicate/", ""),
-        profile.url,
-        profile.params,
-      );
-    
-    break;
-    }
-    case "ollama": {
-      model = new Local(profile.model, profile.url, profile.params);
-    
-    break;
-    }
-    case "mistral": {
-      model = new Mistral(profile.model, profile.url, profile.params);
-    
-    break;
-    }
-    case "groq": {
-      model = new GroqCloudAPI(
-        profile.model.replace("groq/", "").replace("groqcloud/", ""),
-        profile.url,
-        profile.params,
-      );
-    
-    break;
-    }
-    case "huggingface": {
-      model = new HuggingFace(profile.model, profile.url, profile.params);
-    
-    break;
-    }
-    case "novita": {
-      model = new Novita(
-        profile.model.replace("novita/", ""),
-        profile.url,
-        profile.params,
-      );
-    
-    break;
-    }
-    case "qwen": {
-      model = new Qwen(profile.model, profile.url, profile.params);
-    
-    break;
-    }
-    case "xai": {
-      model = new Grok(profile.model, profile.url, profile.params);
-    
-    break;
-    }
-    case "deepseek": {
-      model = new DeepSeek(profile.model, profile.url, profile.params);
-    
-    break;
-    }
-    case "openrouter": {
-      model = new OpenRouter(
-        profile.model.replace("openrouter/", ""),
-        profile.url,
-        profile.params,
-      );
-    
-    break;
-    }
-    default: {
-      throw new Error("Unknown API:", profile.api);
-    }
+      case "google": {
+        model = new Gemini(profile.model, profile.url, profile.params);
+
+        break;
+      }
+      case "openai": {
+        model = new GPT(profile.model, profile.url, profile.params);
+
+        break;
+      }
+      case "anthropic": {
+        model = new Claude(profile.model, profile.url, profile.params);
+
+        break;
+      }
+      case "replicate": {
+        model = new ReplicateAPI(
+          profile.model.replace("replicate/", ""),
+          profile.url,
+          profile.params,
+        );
+
+        break;
+      }
+      case "ollama": {
+        model = new Local(profile.model, profile.url, profile.params);
+
+        break;
+      }
+      case "mistral": {
+        model = new Mistral(profile.model, profile.url, profile.params);
+
+        break;
+      }
+      case "groq": {
+        model = new GroqCloudAPI(
+          profile.model.replace("groq/", "").replace("groqcloud/", ""),
+          profile.url,
+          profile.params,
+        );
+
+        break;
+      }
+      case "huggingface": {
+        model = new HuggingFace(profile.model, profile.url, profile.params);
+
+        break;
+      }
+      case "novita": {
+        model = new Novita(
+          profile.model.replace("novita/", ""),
+          profile.url,
+          profile.params,
+        );
+
+        break;
+      }
+      case "qwen": {
+        model = new Qwen(profile.model, profile.url, profile.params);
+
+        break;
+      }
+      case "xai": {
+        model = new Grok(profile.model, profile.url, profile.params);
+
+        break;
+      }
+      case "deepseek": {
+        model = new DeepSeek(profile.model, profile.url, profile.params);
+
+        break;
+      }
+      case "openrouter": {
+        model = new OpenRouter(
+          profile.model.replace("openrouter/", ""),
+          profile.url,
+          profile.params,
+        );
+
+        break;
+      }
+      default: {
+        throw new Error("Unknown API:", profile.api);
+      }
     }
     return model;
   }
@@ -363,7 +372,8 @@ export class Prompter {
           .reverse()
           .find(
             (message) =>
-              message.role !== "system" && message.content.includes("!newAction("),
+              message.role !== "system" &&
+              message.content.includes("!newAction("),
           )
           ?.content?.match(/!newAction\((.*?)\)/)?.[1] || "";
 
@@ -407,17 +417,19 @@ export class Prompter {
     if (prompt.includes("$LAST_GOALS")) {
       let goal_text = "";
       for (let goal in last_goals) {
-        goal_text += last_goals[goal] ? `You recently successfully completed the goal ${goal}.\n` : `You recently failed to complete the goal ${goal}.\n`;
+        goal_text += last_goals[goal]
+          ? `You recently successfully completed the goal ${goal}.\n`
+          : `You recently failed to complete the goal ${goal}.\n`;
       }
       prompt = prompt.replaceAll("$LAST_GOALS", goal_text.trim());
     }
     if (prompt.includes("$BLUEPRINTS") && this.agent.npc.constructions) {
-        let blueprints = "";
-        for (let blueprint in this.agent.npc.constructions) {
-          blueprints += blueprint + ", ";
-        }
-        prompt = prompt.replaceAll("$BLUEPRINTS", blueprints.slice(0, -2));
+      let blueprints = "";
+      for (let blueprint in this.agent.npc.constructions) {
+        blueprints += blueprint + ", ";
       }
+      prompt = prompt.replaceAll("$BLUEPRINTS", blueprints.slice(0, -2));
+    }
 
     // check if there are any remaining placeholders with syntax $<word>
     let remaining = prompt.match(/\$[A-Z_]+/g);

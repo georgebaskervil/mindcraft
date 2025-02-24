@@ -251,20 +251,26 @@ export function getSmeltingFuel(bot) {
     .items()
     .find(
       (index) =>
-        index.name === "coal" || index.name === "charcoal" || index.name === "blaze_rod",
+        index.name === "coal" ||
+        index.name === "charcoal" ||
+        index.name === "blaze_rod",
     );
   if (fuel) {
     return fuel;
   }
   fuel = bot.inventory
     .items()
-    .find((index) => index.name.includes("log") || index.name.includes("planks"));
+    .find(
+      (index) => index.name.includes("log") || index.name.includes("planks"),
+    );
   if (fuel) {
     return fuel;
   }
   return bot.inventory
     .items()
-    .find((index) => index.name === "coal_block" || index.name === "lava_bucket");
+    .find(
+      (index) => index.name === "coal_block" || index.name === "lava_bucket",
+    );
 }
 
 export function getFuelSmeltOutput(fuelName) {
@@ -556,19 +562,24 @@ function formatPlan({ required, steps, leftovers }) {
 
   if (Object.keys(required).length > 0) {
     lines.push("You are missing the following items:");
-    for (const [item, count] of Object.entries(required)) {lines.push(`- ${count} ${item}`)
-    ;}
+    for (const [item, count] of Object.entries(required)) {
+      lines.push(`- ${count} ${item}`);
+    }
     lines.push("\nOnce you have these items, here's your crafting plan:");
   } else {
-    lines.push("You have all items required to craft this item!", "Here's your crafting plan:");
+    lines.push(
+      "You have all items required to craft this item!",
+      "Here's your crafting plan:",
+    );
   }
 
   lines.push("", ...steps);
 
   if (Object.keys(leftovers).length > 0) {
     lines.push("\nYou will have leftover:");
-    for (const [item, count] of Object.entries(leftovers)) {lines.push(`- ${count} ${item}`)
-    ;}
+    for (const [item, count] of Object.entries(leftovers)) {
+      lines.push(`- ${count} ${item}`);
+    }
   }
 
   return lines.join("\n");

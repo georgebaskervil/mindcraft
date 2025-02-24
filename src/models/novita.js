@@ -57,7 +57,10 @@ export class Novita {
       let start = res.indexOf("<think>");
       let end = res.indexOf("</think>") + 8;
       if (start != -1) {
-        res = end == -1 ? res.slice(0, Math.max(0, start + 7)) : res.slice(0, Math.max(0, start)) + res.slice(Math.max(0, end));
+        res =
+          end == -1
+            ? res.slice(0, Math.max(0, start + 7))
+            : res.slice(0, Math.max(0, start)) + res.slice(Math.max(0, end));
       }
       res = res.trim();
     }

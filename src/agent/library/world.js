@@ -347,10 +347,7 @@ export function getNearbyPlayerNames(bot) {
   let players = getNearbyPlayers(bot, 64);
   let found = [];
   for (const player of players) {
-    if (
-      !found.includes(player.username) &&
-      player.username != bot.username
-    ) {
+    if (!found.includes(player.username) && player.username != bot.username) {
       found.push(player.username);
     }
   }

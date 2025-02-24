@@ -18,7 +18,11 @@ export function docHelper(functions, module_name) {
 
 export function getSkillDocs() {
   let documentArray = [];
-  documentArray = documentArray.concat(docHelper(Object.values(skills), "skills"));
-  documentArray = documentArray.concat(docHelper(Object.values(world), "world"));
+  documentArray = documentArray.concat(
+    docHelper(Object.values(skills), "skills"),
+  );
+  documentArray = documentArray.concat(
+    docHelper(Object.values(world), "world"),
+  );
   return documentArray;
 }

@@ -1,4 +1,6 @@
-Use this service to connect your bot to an unsupported minecraft server versions.
+# Viaproxy Service
+
+Use this service to connect your bot to unsupported Minecraft server versions.
 
 Run:
 
@@ -6,11 +8,9 @@ Run:
 docker-compose --profile viaproxy up
 ```
 
-After first start it will create config file `services/viaproxy/viaproxy.yml`.
+After the first start, it will create the config file `services/viaproxy/viaproxy.yml`.
 
-Edit this file, and change your desired target `target-address`,
-
-then point your `settings.js` `host` and `port` to viaproxy endpoint:
+Edit this file to change your desired target `target-address`, then update your `settings.js` with the following `host` and `port` for the viaproxy endpoint:
 
 ```javascript
     "host": "host.docker.internal",

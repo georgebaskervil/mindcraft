@@ -40,13 +40,15 @@ export class Gemini {
       // systemInstruction does not work bc google is trash
     };
 
-    model = this.url ? this.genAI.getGenerativeModel(
-        modelConfig,
-        { baseUrl: this.url },
-        { safetySettings: this.safetySettings },
-      ) : this.genAI.getGenerativeModel(modelConfig, {
-        safetySettings: this.safetySettings,
-      });
+    model = this.url
+      ? this.genAI.getGenerativeModel(
+          modelConfig,
+          { baseUrl: this.url },
+          { safetySettings: this.safetySettings },
+        )
+      : this.genAI.getGenerativeModel(modelConfig, {
+          safetySettings: this.safetySettings,
+        });
 
     console.log("Awaiting Google API response...");
 
@@ -75,10 +77,12 @@ export class Gemini {
 
   async embed(text) {
     let model;
-    model = this.url ? this.genAI.getGenerativeModel(
-        { model: "text-embedding-004" },
-        { baseUrl: this.url },
-      ) : this.genAI.getGenerativeModel({ model: "text-embedding-004" });
+    model = this.url
+      ? this.genAI.getGenerativeModel(
+          { model: "text-embedding-004" },
+          { baseUrl: this.url },
+        )
+      : this.genAI.getGenerativeModel({ model: "text-embedding-004" });
 
     const result = await model.embedContent(text);
     return result.embedding.values;

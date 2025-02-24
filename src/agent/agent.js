@@ -300,7 +300,8 @@ export class Agent {
       const MAX_LOG = 500;
       if (behavior_log.length > MAX_LOG) {
         behavior_log =
-          "..." + behavior_log.slice(Math.max(0, behavior_log.length - MAX_LOG));
+          "..." +
+          behavior_log.slice(Math.max(0, behavior_log.length - MAX_LOG));
       }
       behavior_log =
         "Recent behaviors log: \n" +
@@ -355,7 +356,9 @@ export class Agent {
           this.routeResponse(source, res);
         } else {
           // only output command name
-          let pre_message = res.slice(0, Math.max(0, res.indexOf(command_name))).trim();
+          let pre_message = res
+            .slice(0, Math.max(0, res.indexOf(command_name)))
+            .trim();
           let chat_message = `*used ${command_name.slice(1)}*`;
           if (pre_message.length > 0) {
             chat_message = `${pre_message}  ${chat_message}`;
