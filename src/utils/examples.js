@@ -70,7 +70,8 @@ export class Examples {
       );
     }
     let selected = this.examples.slice(0, this.select_num);
-    return JSON.parse(JSON.stringify(selected)); // deep copy
+    const clone = structuredClone(selected);
+    return clone; // deep copy
   }
 
   async createExampleMessage(turns) {

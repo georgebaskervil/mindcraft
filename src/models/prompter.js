@@ -1,7 +1,7 @@
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { Examples } from "../utils/examples.js";
-import { getCommandDocs } from "../agent/commands/index.js";
-import { getSkillDocs } from "../agent/library/index.js";
+import { getCommandDocumentation } from "../agent/commands/index.js";
+import { getSkillDocumentation } from "../agent/library/index.js";
 import { SkillLibrary } from "../agent/library/skill_library.js";
 import { stringifyTurns } from "../utils/text.js";
 import { getCommand } from "../agent/commands/index.js";
@@ -49,7 +49,7 @@ export class Prompter {
     this.coding_examples = null;
 
     let name = this.profile.name;
-    this.cooldown = this.profile.cooldown ? this.profile.cooldown : 0;
+    this.cooldown = this.profile.cooldown || 0;
     this.last_prompt_time = 0;
     this.awaiting_coding = false;
 
@@ -187,7 +187,7 @@ export class Prompter {
         profile.model.includes("mistralai/") ||
         profile.model.includes("mistral/")
       ) {
-        model_profile.api = "mistral";
+        profile.api = "mistral";
       } else if (
         profile.model.includes("groq/") ||
         profile.model.includes("groqcloud/")
@@ -364,7 +364,7 @@ export class Prompter {
       );
     }
     if (prompt.includes("$COMMAND_DOCS")) {
-      prompt = prompt.replaceAll("$COMMAND_DOCS", getCommandDocs());
+      prompt = prompt.replaceAll("$COMMAND_DOCS", getCommandDocumentation());
     }
     if (prompt.includes("$CODE_DOCS")) {
       const code_task_content =
@@ -385,9 +385,9 @@ export class Prompter {
         ),
       );
     }
-    prompt = prompt.replaceAll("$COMMAND_DOCS", getCommandDocs());
+    prompt = prompt.replaceAll("$COMMAND_DOCS", getCommandDocumentation());
     if (prompt.includes("$CODE_DOCS")) {
-      prompt = prompt.replaceAll("$CODE_DOCS", getSkillDocs());
+      prompt = prompt.replaceAll("$CODE_DOCS", getSkillDocumentation());
     }
     if (prompt.includes("$EXAMPLES") && examples !== null) {
       prompt = prompt.replaceAll(
@@ -506,8 +506,8 @@ export class Prompter {
     let messages = this.agent.history.getHistory();
     messages.push({ role: "user", content: new_message });
     prompt = await this.replaceStrings(prompt, null, null, messages);
-    let res = await this.chat_model.sendRequest([], prompt);
-    return res.trim().toLowerCase() === "respond";
+    let response = await this.chat_model.sendRequest([], prompt);
+    return response.trim().toLowerCase() === "respond";
   }
 
   async promptGoalSetting(messages, last_goals) {
@@ -526,22 +526,25 @@ export class Prompter {
     );
     let user_messages = [{ role: "user", content: user_message }];
 
-    let res = await this.chat_model.sendRequest(user_messages, system_message);
+    let response = await this.chat_model.sendRequest(
+      user_messages,
+      system_message,
+    );
 
     let goal = null;
     try {
-      let data = res.split("```")[1].replace("json", "").trim();
+      let data = response.split("```")[1].replace("json", "").trim();
       goal = JSON.parse(data);
     } catch (error) {
-      console.log("Failed to parse goal:", res, error);
+      console.log("Failed to parse goal:", response, error);
     }
     if (
       !goal ||
       !goal.name ||
       !goal.quantity ||
-      isNaN(Number.parseInt(goal.quantity))
+      Number.isNaN(Number.parseInt(goal.quantity))
     ) {
-      console.log("Failed to set goal:", res);
+      console.log("Failed to set goal:", response);
       return null;
     }
     goal.quantity = Number.parseInt(goal.quantity);

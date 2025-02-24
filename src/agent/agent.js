@@ -274,9 +274,9 @@ export class Agent {
           // add the preceding message to the history to give context for newAction
           this.history.add(source, message);
         }
-        let execute_res = await executeCommand(this, message);
-        if (execute_res) {
-          this.routeResponse(source, execute_res);
+        let executeResult = await executeCommand(this, message);
+        if (executeResult) {
+          this.routeResponse(source, executeResult);
         }
         return true;
       }
@@ -322,27 +322,21 @@ export class Agent {
         break;
       }
       let history = this.history.getHistory();
-      let res = await this.prompter.promptConvo(history);
+      let response = await this.prompter.promptConvo(history);
 
-      console.log(`${this.name} full response to ${source}: ""${res}""`);
+      console.log(`${this.name} full response to ${source}: ""${response}""`);
 
-      if (res.trim().length === 0) {
+      if (response.trim().length === 0) {
         console.warn("no response");
         break; // empty response ends loop
       }
 
-      let command_name = containsCommand(res);
+      let command_name = containsCommand(response);
 
       if (command_name) {
         // contains query or command
-        res = truncCommandMessage(res); // everything after the command is ignored
-        this.history.add(this.name, res);
-
-        if (!commandExists(command_name)) {
-          this.history.add("system", `Command ${command_name} does not exist.`);
-          console.warn("Agent hallucinated command:", command_name);
-          continue;
-        }
+        response = truncCommandMessage(response); // everything after the command is ignored
+        this.history.add(this.name, response);
 
         if (checkInterrupt()) {
           break;
@@ -353,11 +347,11 @@ export class Agent {
         );
 
         if (settings.verbose_commands) {
-          this.routeResponse(source, res);
+          this.routeResponse(source, response);
         } else {
           // only output command name
-          let pre_message = res
-            .slice(0, Math.max(0, res.indexOf(command_name)))
+          let pre_message = response
+            .slice(0, Math.max(0, response.indexOf(command_name)))
             .trim();
           let chat_message = `*used ${command_name.slice(1)}*`;
           if (pre_message.length > 0) {
@@ -366,20 +360,20 @@ export class Agent {
           this.routeResponse(source, chat_message);
         }
 
-        let execute_res = await executeCommand(this, res);
+        let executeResult = await executeCommand(this, response);
 
-        console.log("Agent executed:", command_name, "and got:", execute_res);
+        console.log("Agent executed:", command_name, "and got:", executeResult);
         used_command = true;
 
-        if (execute_res) {
-          this.history.add("system", execute_res);
+        if (executeResult) {
+          this.history.add("system", executeResult);
         } else {
           break;
         }
       } else {
         // conversation response
-        this.history.add(this.name, res);
-        this.routeResponse(source, res);
+        this.history.add(this.name, response);
+        this.routeResponse(source, response);
         break;
       }
 
@@ -423,7 +417,8 @@ export class Agent {
       to_translate = to_translate.slice(0, Math.max(0, translate_up_to));
       remaining = message.slice(Math.max(0, translate_up_to));
     }
-    message = (await handleTranslation(to_translate)).trim() + " " + remaining;
+    const translated = await handleTranslation(to_translate);
+    message = translated.trim() + " " + remaining;
     // newlines are interpreted as separate chats, which triggers spam filters. replace them with spaces
     message = message.replaceAll("\n", " ");
 
@@ -533,14 +528,14 @@ export class Agent {
     await this.bot.modes.update();
     this.self_prompter.update(delta);
     if (this.task.data) {
-      let res = this.task.isDone();
-      if (res) {
+      let result = this.task.isDone();
+      if (result) {
         await this.history.add(
           "system",
-          `${res.message} ended with code : ${res.code}`,
+          `${result.message} ended with code : ${result.code}`,
         );
         await this.history.save();
-        console.log("Task finished:", res.message);
+        console.log("Task finished:", result.message);
         this.killAll();
       }
     }

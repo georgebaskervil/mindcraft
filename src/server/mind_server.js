@@ -10,6 +10,7 @@ let server;
 const registeredAgents = new Set();
 const inGameAgents = {};
 const agentManagers = {}; // socket for main process that registers/controls agents
+const connectedAgents = new Set();
 
 // Initialize the server
 export function createMindServer(port = 8080) {

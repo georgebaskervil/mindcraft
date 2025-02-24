@@ -1,15 +1,15 @@
 export function stringifyTurns(turns) {
-  let res = "";
+  let result = "";
   for (let turn of turns) {
     if (turn.role === "assistant") {
-      res += `\nYour output:\n${turn.content}`;
+      result += `\nYour output:\n${turn.content}`;
     } else if (turn.role === "system") {
-      res += `\nSystem output: ${turn.content}`;
+      result += `\nSystem output: ${turn.content}`;
     } else {
-      res += `\nUser input: ${turn.content}`;
+      result += `\nUser input: ${turn.content}`;
     }
   }
-  return res.trim();
+  return result.trim();
 }
 
 export function toSinglePrompt(
@@ -56,7 +56,7 @@ export function wordOverlapScore(text1, text2) {
 // - separates repeat assistant messages with filler user messages
 export function strictFormat(turns) {
   let previous_role = null;
-  let messages = [];
+  let result = [];
   let filler = { role: "user", content: "_" };
   for (let message of turns) {
     message.content = message.content.trim();
@@ -66,20 +66,20 @@ export function strictFormat(turns) {
     }
     if (message.role === previous_role && message.role === "assistant") {
       // insert empty user message to separate assistant messages
-      messages.push(filler, message);
+      result.push(filler, message);
     } else if (message.role === previous_role) {
       // combine new message with previous message instead of adding a new one
-      messages.at(-1).content += "\n" + message.content;
+      result.at(-1).content += "\n" + message.content;
     } else {
-      messages.push(message);
+      result.push(message);
     }
     previous_role = message.role;
   }
-  if (messages.length > 0 && messages[0].role !== "user") {
-    messages.unshift(filler); // anthropic requires user message to start
+  if (result.length > 0 && result[0].role !== "user") {
+    result.unshift(filler); // anthropic requires user message to start
   }
-  if (messages.length === 0) {
-    messages.push(filler);
+  if (result.length === 0) {
+    result.push(filler);
   }
-  return messages;
+  return result;
 }

@@ -27,7 +27,7 @@ export class History {
 
   getHistory() {
     // expects an Examples object
-    return JSON.parse(JSON.stringify(this.turns));
+    return structuredClone(this.turns);
   }
 
   async summarizeMemories(turns) {

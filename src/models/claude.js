@@ -19,7 +19,7 @@ export class Claude {
 
   async sendRequest(turns, systemMessage) {
     const messages = strictFormat(turns);
-    let res = null;
+    let result = null;
     try {
       console.log("Awaiting anthropic api response...");
       if (!this.params.max_tokens) {
@@ -33,12 +33,12 @@ export class Claude {
       });
 
       console.log("Received.");
-      res = resp.content[0].text;
+      result = resp.content[0].text;
     } catch (error) {
       console.log(error);
-      res = "My brain disconnected, try again.";
+      result = "My brain disconnected, try again.";
     }
-    return res;
+    return result;
   }
 
   async embed(text) {

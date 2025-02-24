@@ -60,7 +60,7 @@ class ItemNode {
 
   setCollectable(source = null, tool = null) {
     this.type = "block";
-    this.source = source ? source : this.name;
+    this.source = source || this.name;
     if (tool) {
       if (this.manager.nodes[tool] === undefined) {
         this.manager.nodes[tool] = new ItemWrapper(
@@ -166,9 +166,9 @@ class ItemNode {
       return { node: this, quantity: q };
     }
     for (let child of this.getChildren()) {
-      let res = child.node.getNext(child.quantity);
-      if (res) {
-        return res;
+      let result = child.node.getNext(child.quantity);
+      if (result) {
+        return result;
       }
     }
     return null;
@@ -207,9 +207,13 @@ class ItemNode {
         break;
       }
       case "hunt": {
+        let result;
         for (let index = 0; index < quantity; index++) {
-          res = await skills.attackNearest(this.manager.agent.bot, this.source);
-          if (!res || this.manager.agent.bot.interrupt_code) {
+          result = await skills.attackNearest(
+            this.manager.agent.bot,
+            this.source,
+          );
+          if (!result || this.manager.agent.bot.interrupt_code) {
             break;
           }
         }

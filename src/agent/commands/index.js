@@ -4,7 +4,7 @@ import { queryList } from "./queries.js";
 
 let suppressNoDomainWarning = false;
 
-const commandList = queryList.concat(actionsList);
+const commandList = [...queryList, ...actionsList];
 const commandMap = {};
 for (let command of commandList) {
   commandMap[command.name] = command;
@@ -134,7 +134,7 @@ export function parseCommandMessage(message) {
       (argument.startsWith('"') && argument.endsWith('"')) ||
       (argument.startsWith("'") && argument.endsWith("'"))
     ) {
-      argument = argument.substring(1, argument.length - 1);
+      argument = argument.slice(1, -1);
     }
 
     //Convert to the correct type
@@ -156,7 +156,8 @@ export function parseCommandMessage(message) {
         if (argument.endsWith("plank")) {
           argument += "s";
         }
-      } // catches common mistakes like "oak_plank" instead of "oak_planks"
+        break;
+      }
       case "string": {
         break;
       }
@@ -221,7 +222,7 @@ export function truncCommandMessage(message) {
 }
 
 export function isAction(name) {
-  return actionsList.find((action) => action.name === name) !== undefined;
+  return actionsList.some((action) => action.name === name);
 }
 
 /**
@@ -271,7 +272,7 @@ export async function executeCommand(agent, message) {
   }
 }
 
-export function getCommandDocs() {
+export function getCommandDocumentation() {
   const typeTranslations = {
     //This was added to keep the prompt the same as before type checks were implemented.
     //If the language model is giving invalid inputs changing this might help.
@@ -281,17 +282,17 @@ export function getCommandDocs() {
     ItemName: "string",
     boolean: "bool",
   };
-  let docs = `\n*COMMAND DOCS\n You can use the following commands to perform actions and get information about the world. 
+  let documentation = `\n*COMMAND DOCS\n You can use the following commands to perform actions and get information about the world. 
     Use the commands with the syntax: !commandName or !commandName("arg1", 1.2, ...) if the command takes arguments.\n
     Do not use codeblocks. Use double quotes for strings. Only use one command in each response, trailing commands and comments will be ignored.\n`;
   for (let command of commandList) {
-    docs += command.name + ": " + command.description + "\n";
+    documentation += command.name + ": " + command.description + "\n";
     if (command.params) {
-      docs += "Params:\n";
+      documentation += "Params:\n";
       for (let parameter in command.params) {
-        docs += `${parameter}: (${typeTranslations[command.params[parameter].type] ?? command.params[parameter].type}) ${command.params[parameter].description}\n`;
+        documentation += `${parameter}: (${typeTranslations[command.params[parameter].type] ?? command.params[parameter].type}) ${command.params[parameter].description}\n`;
       }
     }
   }
-  return docs + "*\n";
+  return documentation + "*\n";
 }

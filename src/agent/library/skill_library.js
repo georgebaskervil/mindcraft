@@ -1,5 +1,5 @@
 import { cosineSimilarity } from "../../utils/math.js";
-import { getSkillDocs } from "./index.js";
+import { getSkillDocumentation } from "./index.js";
 import { wordOverlapScore } from "../../utils/text.js";
 
 export class SkillLibrary {
@@ -10,11 +10,11 @@ export class SkillLibrary {
     this.skill_docs = null;
   }
   async initSkillLibrary() {
-    const skillDocs = getSkillDocs();
-    this.skill_docs = skillDocs;
+    const skillDocumentation = getSkillDocumentation();
+    this.skill_docs = skillDocumentation;
     if (this.embedding_model) {
       try {
-        const embeddingPromises = skillDocs.map((document) => {
+        const embeddingPromises = skillDocumentation.map((document) => {
           return (async () => {
             let function_name_desc = document.split("\n").slice(0, 2).join("");
             this.skill_docs_embeddings[document] =
@@ -65,17 +65,17 @@ export class SkillLibrary {
     let length = skill_document_similarities.length;
     select_number =
       typeof select_number !== "number" ||
-      isNaN(select_number) ||
+      Number.isNaN(select_number) ||
       select_number < 0
         ? length
         : Math.min(Math.floor(select_number), length);
-    let selected_docs = skill_document_similarities.slice(0, select_number);
-    let relevant_skill_docs =
+    let selectedDocuments = skill_document_similarities.slice(0, select_number);
+    let relevantSkillDocumentation =
       "#### RELEVANT DOCS INFO ###\nThe following functions are listed in descending order of relevance.\n";
-    relevant_skill_docs += "SkillDocs:\n";
-    relevant_skill_docs += selected_docs
+    relevantSkillDocumentation += "SkillDocs:\n";
+    relevantSkillDocumentation += selectedDocuments
       .map((document) => `${document.doc_key}`)
       .join("\n### ");
-    return relevant_skill_docs;
+    return relevantSkillDocumentation;
   }
 }

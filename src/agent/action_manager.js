@@ -1,3 +1,5 @@
+import assert from "node:assert";
+
 export class ActionManager {
   constructor(agent) {
     this.agent = agent;
@@ -66,13 +68,13 @@ export class ActionManager {
       (!this.agent.self_prompter.isActive() || new_resume)
     ) {
       this.currentActionLabel = this.resume_name;
-      let res = await this._executeAction(
+      let result = await this._executeAction(
         this.resume_name,
         this.resume_func,
         timeout,
       );
       this.currentActionLabel = "";
-      return res;
+      return result;
     } else {
       return {
         success: false,
@@ -141,13 +143,13 @@ export class ActionManager {
       // Log the full stack trace
       console.error(error.stack);
       await this.stop();
-      error = error.toString();
+      const errorMessage = error.toString();
 
       let message =
         this._getBotOutputSummary() +
         "!!Code threw exception!!\n" +
         "Error: " +
-        error +
+        errorMessage +
         "\n" +
         "Stack trace:\n" +
         error.stack +

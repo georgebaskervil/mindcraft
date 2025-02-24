@@ -3,6 +3,11 @@ import { executeCommand } from "./commands/index.js";
 import { getPosition } from "./library/world.js";
 import settings from "../../settings.js";
 
+// Helper function moved to module scope
+function getRandomOffset(range) {
+  return Math.floor(Math.random() * (range * 2 + 1)) - range;
+}
+
 export class TaskValidator {
   constructor(data, agent) {
     this.target = data.target;
@@ -69,7 +74,7 @@ export class Task {
     try {
       const tasksFile = readFileSync(task_path, "utf8");
       const tasks = JSON.parse(tasksFile);
-      const task = tasks[task_id];
+      let task = tasks[task_id];
       if (!task) {
         throw new Error(`Task ${task_id} not found`);
       }
@@ -137,11 +142,6 @@ export class Task {
       //wait for a bit so inventory is set
       await new Promise((resolve) => setTimeout(resolve, 500));
       console.log("Done giving inventory items.");
-    }
-    // Function to generate random numbers
-
-    function getRandomOffset(range) {
-      return Math.floor(Math.random() * (range * 2 + 1)) - range;
     }
 
     let human_player_name = null;

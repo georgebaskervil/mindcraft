@@ -15,7 +15,10 @@ export class Qwen {
   }
 
   async sendRequest(turns, systemMessage, stop_seq = "***") {
-    let messages = [{ role: "system", content: systemMessage }].concat(turns);
+    let baseMessages = [{ role: "system", content: systemMessage }];
+    let contextMessages = turns;
+
+    let messages = [...baseMessages, ...contextMessages];
 
     messages = strictFormat(messages);
 
@@ -26,7 +29,7 @@ export class Qwen {
       ...this.params,
     };
 
-    let res = null;
+    let response = null;
     try {
       console.log("Awaiting Qwen api response...");
       // console.log('Messages:', messages);
@@ -35,7 +38,7 @@ export class Qwen {
         throw new Error("Context length exceeded");
       }
       console.log("Received.");
-      res = completion.choices[0].message.content;
+      response = completion.choices[0].message.content;
     } catch (error) {
       if (
         (error.message == "Context length exceeded" ||
@@ -48,10 +51,10 @@ export class Qwen {
         return await this.sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
         console.log(error);
-        res = "My brain disconnected, try again.";
+        response = "My brain disconnected, try again.";
       }
     }
-    return res;
+    return response;
   }
 
   // Why random backoff?

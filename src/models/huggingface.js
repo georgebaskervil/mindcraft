@@ -21,7 +21,7 @@ export class HuggingFace {
     let model_name = this.model_name || "meta-llama/Meta-Llama-3-8B";
 
     const input = systemMessage + "\n" + prompt;
-    let res = "";
+    let response = "";
     try {
       console.log("Awaiting Hugging Face API response...");
       for await (const chunk of this.huggingface.chatCompletionStream({
@@ -29,15 +29,15 @@ export class HuggingFace {
         messages: [{ role: "user", content: input }],
         ...this.params,
       })) {
-        res += chunk.choices[0]?.delta?.content || "";
+        response += chunk.choices[0]?.delta?.content || "";
       }
     } catch (error) {
       console.log(error);
-      res = "My brain disconnected, try again.";
+      response = "My brain disconnected, try again.";
     }
     console.log("Received.");
-    console.log(res);
-    return res;
+    console.log(response);
+    return response;
   }
 
   async embed(text) {

@@ -17,8 +17,8 @@ export class GroqCloudAPI {
   }
 
   async sendRequest(turns, systemMessage, stop_seq = null) {
-    let messages = [{ role: "system", content: systemMessage }].concat(turns);
-    let res = null;
+    let messages = [{ role: "system", content: systemMessage }, ...turns];
+    let result = null;
     try {
       console.log("Awaiting Groq response...");
       if (!this.params.max_tokens) {
@@ -32,17 +32,17 @@ export class GroqCloudAPI {
         ...this.params,
       });
 
-      let temp_res = "";
+      let temporaryResult = "";
       for await (const chunk of completion) {
-        temp_res += chunk.choices[0]?.delta?.content || "";
+        temporaryResult += chunk.choices[0]?.delta?.content || "";
       }
 
-      res = temp_res;
+      result = temporaryResult;
     } catch (error) {
       console.log(error);
-      res = "My brain just kinda stopped working. Try again.";
+      result = "My brain just kinda stopped working. Try again.";
     }
-    return res;
+    return result;
   }
 
   async embed(text) {

@@ -45,6 +45,7 @@ export default [
       "no-unreachable": "off",
       "unicorn/filename-case": "off",
       "unicorn/no-null": "off",
+      "unicorn/no-process-exit": "off",
     },
   },
 ];

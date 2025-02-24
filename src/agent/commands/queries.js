@@ -1,6 +1,6 @@
 import * as world from "../library/world.js";
 import * as mc from "../../utils/mcdata.js";
-import { getCommandDocs } from "./index.js";
+import { getCommandDocumentation } from "./index.js";
 import convoManager from "../conversation.js";
 
 const pad = (string_) => {
@@ -14,15 +14,15 @@ export const queryList = [
     description: "Get your bot's location, health, hunger, and time of day.",
     perform: function (agent) {
       let bot = agent.bot;
-      let res = "STATS";
+      let result = "STATS";
       let pos = bot.entity.position;
       // display position to 2 decimal places
-      res += `\n- Position: x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}, z: ${pos.z.toFixed(2)}`;
+      result += `\n- Position: x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}, z: ${pos.z.toFixed(2)}`;
       // Gameplay
-      res += `\n- Gamemode: ${bot.game.gameMode}`;
-      res += `\n- Health: ${Math.round(bot.health)} / 20`;
-      res += `\n- Hunger: ${Math.round(bot.food)} / 20`;
-      res += `\n- Biome: ${world.getBiomeName(bot)}`;
+      result += `\n- Gamemode: ${bot.game.gameMode}`;
+      result += `\n- Health: ${Math.round(bot.health)} / 20`;
+      result += `\n- Hunger: ${Math.round(bot.food)} / 20`;
+      result += `\n- Biome: ${world.getBiomeName(bot)}`;
       let weather = "Clear";
       if (bot.rainState > 0) {
         weather = "Rain";
@@ -30,20 +30,20 @@ export const queryList = [
       if (bot.thunderState > 0) {
         weather = "Thunderstorm";
       }
-      res += `\n- Weather: ${weather}`;
+      result += `\n- Weather: ${weather}`;
       // let block = bot.blockAt(pos);
-      // res += `\n- Artificial light: ${block.skyLight}`;
-      // res += `\n- Sky light: ${block.light}`;
+      // result += `\n- Artificial light: ${block.skyLight}`;
+      // result += `\n- Sky light: ${block.light}`;
       // light properties are bugged, they are not accurate
-      res += "\n- " + world.getSurroundingBlocks(bot).join("\n- ");
-      res += `\n- First Solid Block Above Head: ${world.getFirstBlockAboveHead(bot, null, 32)}`;
+      result += "\n- " + world.getSurroundingBlocks(bot).join("\n- ");
+      result += `\n- First Solid Block Above Head: ${world.getFirstBlockAboveHead(bot, null, 32)}`;
 
       if (bot.time.timeOfDay < 6000) {
-        res += "\n- Time: Morning";
+        result += "\n- Time: Morning";
       } else if (bot.time.timeOfDay < 12_000) {
-        res += "\n- Time: Afternoon";
+        result += "\n- Time: Afternoon";
       } else {
-        res += "\n- Time: Night";
+        result += "\n- Time: Night";
       }
 
       // get the bot's current action
@@ -51,21 +51,21 @@ export const queryList = [
       if (agent.isIdle()) {
         action = "Idle";
       }
-      res += `\- Current Action: ${action}`;
+      result += `\n- Current Action: ${action}`;
 
       let players = world.getNearbyPlayerNames(bot);
       let bots = convoManager.getInGameAgents().filter((b) => b !== agent.name);
       players = players.filter((p) => !bots.includes(p));
 
-      res +=
+      result +=
         "\n- Nearby Human Players: " +
         (players.length > 0 ? players.join(", ") : "None.");
-      res +=
+      result +=
         "\n- Nearby Bot Players: " +
         (bots.length > 0 ? bots.join(", ") : "None.");
 
-      res += "\n" + agent.bot.modes.getMiniDocs() + "\n";
-      return pad(res);
+      result += "\n" + agent.bot.modes.getMiniDocs() + "\n";
+      return pad(result);
     },
   },
   {
@@ -74,16 +74,16 @@ export const queryList = [
     perform: function (agent) {
       let bot = agent.bot;
       let inventory = world.getInventoryCounts(bot);
-      let res = "INVENTORY";
+      let result = "INVENTORY";
       for (const item in inventory) {
         if (inventory[item] && inventory[item] > 0) {
-          res += `\n- ${item}: ${inventory[item]}`;
+          result += `\n- ${item}: ${inventory[item]}`;
         }
       }
-      if (res === "INVENTORY") {
-        res += ": Nothing";
+      if (result === "INVENTORY") {
+        result += ": Nothing";
       } else if (agent.bot.game.gameMode === "creative") {
-        res +=
+        result +=
           "\n(You have infinite items in creative mode. You do not need to gather resources!!)";
       }
 
@@ -91,24 +91,24 @@ export const queryList = [
       let chestplate = bot.inventory.slots[6];
       let leggings = bot.inventory.slots[7];
       let boots = bot.inventory.slots[8];
-      res += "\nWEARING: ";
+      result += "\nWEARING: ";
       if (helmet) {
-        res += `\nHead: ${helmet.name}`;
+        result += `\nHead: ${helmet.name}`;
       }
       if (chestplate) {
-        res += `\nTorso: ${chestplate.name}`;
+        result += `\nTorso: ${chestplate.name}`;
       }
       if (leggings) {
-        res += `\nLegs: ${leggings.name}`;
+        result += `\nLegs: ${leggings.name}`;
       }
       if (boots) {
-        res += `\nFeet: ${boots.name}`;
+        result += `\nFeet: ${boots.name}`;
       }
       if (!helmet && !chestplate && !leggings && !boots) {
-        res += "Nothing";
+        result += "Nothing";
       }
 
-      return pad(res);
+      return pad(result);
     },
   },
   {
@@ -116,19 +116,19 @@ export const queryList = [
     description: "Get the blocks near the bot.",
     perform: function (agent) {
       let bot = agent.bot;
-      let res = "NEARBY_BLOCKS";
+      let result = "NEARBY_BLOCKS";
       let blocks = world.getNearbyBlockTypes(bot);
       for (const block of blocks) {
-        res += `\n- ${block}`;
+        result += `\n- ${block}`;
       }
       if (blocks.length === 0) {
-        res += ": none";
+        result += ": none";
       } else {
         // Environmental Awareness
-        res += "\n- " + world.getSurroundingBlocks(bot).join("\n- ");
-        res += `\n- First Solid Block Above Head: ${world.getFirstBlockAboveHead(bot, null, 32)}`;
+        result += "\n- " + world.getSurroundingBlocks(bot).join("\n- ");
+        result += `\n- First Solid Block Above Head: ${world.getFirstBlockAboveHead(bot, null, 32)}`;
       }
-      return pad(res);
+      return pad(result);
     },
   },
   {
@@ -136,14 +136,14 @@ export const queryList = [
     description: "Get the craftable items with the bot's inventory.",
     perform: function (agent) {
       let craftable = world.getCraftableItems(agent.bot);
-      let res = "CRAFTABLE_ITEMS";
+      let result = "CRAFTABLE_ITEMS";
       for (const item of craftable) {
-        res += `\n- ${item}`;
+        result += `\n- ${item}`;
       }
-      if (res == "CRAFTABLE_ITEMS") {
-        res += ": none";
+      if (result == "CRAFTABLE_ITEMS") {
+        result += ": none";
       }
-      return pad(res);
+      return pad(result);
     },
   },
   {
@@ -151,28 +151,28 @@ export const queryList = [
     description: "Get the nearby players and entities.",
     perform: function (agent) {
       let bot = agent.bot;
-      let res = "NEARBY_ENTITIES";
+      let result = "NEARBY_ENTITIES";
       let players = world.getNearbyPlayerNames(bot);
       let bots = convoManager.getInGameAgents().filter((b) => b !== agent.name);
       players = players.filter((p) => !bots.includes(p));
 
       for (const player of players) {
-        res += `\n- Human player: ${player}`;
+        result += `\n- Human player: ${player}`;
       }
       for (const bot of bots) {
-        res += `\n- Bot player: ${bot}`;
+        result += `\n- Bot player: ${bot}`;
       }
 
       for (const entity of world.getNearbyEntityTypes(bot)) {
         if (entity === "player" || entity === "item") {
           continue;
         }
-        res += `\n- entities: ${entity}`;
+        result += `\n- entities: ${entity}`;
       }
-      if (res == "NEARBY_ENTITIES") {
-        res += ": none";
+      if (result == "NEARBY_ENTITIES") {
+        result += ": none";
       }
-      return pad(res);
+      return pad(result);
     },
   },
   {
@@ -235,7 +235,7 @@ export const queryList = [
     name: "!help",
     description: "Lists all available commands and their descriptions.",
     perform: async function (agent) {
-      return getCommandDocs();
+      return getCommandDocumentation();
     },
   },
 ];

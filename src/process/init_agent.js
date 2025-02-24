@@ -53,7 +53,9 @@ const argv = yargs(arguments_)
   }).argv;
 
 // Wrap agent start in async IIFE with proper error handling
-(async () => {
+await initializeAgent();
+
+async function initializeAgent() {
   try {
     console.log("Starting agent with profile:", argv.profile);
     const agent = new Agent();
@@ -71,4 +73,4 @@ const argv = yargs(arguments_)
     console.error(error.stack);
     process.exit(1);
   }
-})();
+}

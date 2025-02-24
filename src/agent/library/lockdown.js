@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import "ses";
 
 // This sets up the secure environment

@@ -18,9 +18,10 @@ export class Novita {
   }
 
   async sendRequest(turns, systemMessage, stop_seq = "***") {
-    let messages = [{ role: "system", content: systemMessage }].concat(turns);
+    let messages = [{ role: "system", content: systemMessage }, ...turns];
 
     messages = strictFormat(messages);
+    messages = [...messages, ...turns];
 
     const pack = {
       model: this.model_name || "meta-llama/llama-3.1-70b-instruct",
@@ -29,7 +30,7 @@ export class Novita {
       ...this.params,
     };
 
-    let res = null;
+    let response = null;
     try {
       console.log("Awaiting novita api response...");
       let completion = await this.openai.chat.completions.create(pack);
@@ -37,7 +38,7 @@ export class Novita {
         throw new Error("Context length exceeded");
       }
       console.log("Received.");
-      res = completion.choices[0].message.content;
+      response = completion.choices[0].message.content;
     } catch (error) {
       if (
         (error.message == "Context length exceeded" ||
@@ -47,24 +48,26 @@ export class Novita {
         console.log(
           "Context length exceeded, trying again with shorter context.",
         );
+        // eslint-disable-next-line no-undef
         return await sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
         console.log(error);
-        res = "My brain disconnected, try again.";
+        response = "My brain disconnected, try again.";
       }
     }
-    if (res.includes("<think>")) {
-      let start = res.indexOf("<think>");
-      let end = res.indexOf("</think>") + 8;
+    if (response.includes("<think>")) {
+      let start = response.indexOf("<think>");
+      let end = response.indexOf("</think>") + 8;
       if (start != -1) {
-        res =
+        response =
           end == -1
-            ? res.slice(0, Math.max(0, start + 7))
-            : res.slice(0, Math.max(0, start)) + res.slice(Math.max(0, end));
+            ? response.slice(0, Math.max(0, start + 7))
+            : response.slice(0, Math.max(0, start)) +
+              response.slice(Math.max(0, end));
       }
-      res = res.trim();
+      response = response.trim();
     }
-    return res;
+    return response;
   }
 
   async embed(text) {

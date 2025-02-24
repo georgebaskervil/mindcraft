@@ -9,7 +9,7 @@ export class Grok {
     this.params = parameters;
 
     let config = {};
-    config.baseURL = url ? url : "https://api.x.ai/v1";
+    config.baseURL = url || "https://api.x.ai/v1";
 
     config.apiKey = getKey("XAI_API_KEY");
 
@@ -17,7 +17,7 @@ export class Grok {
   }
 
   async sendRequest(turns, systemMessage, stop_seq = "***") {
-    let messages = [{ role: "system", content: systemMessage }].concat(turns);
+    let messages = [{ role: "system", content: systemMessage }, ...turns];
 
     const pack = {
       model: this.model_name || "grok-beta",
@@ -26,16 +26,15 @@ export class Grok {
       ...this.params,
     };
 
-    let res = null;
+    let result = null;
     try {
       console.log("Awaiting xai api response...");
-      ///console.log('Messages:', messages);
       let completion = await this.openai.chat.completions.create(pack);
       if (completion.choices[0].finish_reason == "length") {
         throw new Error("Context length exceeded");
       }
       console.log("Received.");
-      res = completion.choices[0].message.content;
+      result = completion.choices[0].message.content;
     } catch (error) {
       if (
         (error.message == "Context length exceeded" ||
@@ -48,11 +47,11 @@ export class Grok {
         return await this.sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
         console.log(error);
-        res = "My brain disconnected, try again.";
+        result = "My brain disconnected, try again.";
       }
     }
     // sometimes outputs special token <|separator|>, just replace it
-    return res.replaceAll("<|separator|>", "*no response*");
+    return result.replaceAll("<|separator|>", "*no response*");
   }
 
   async embed(text) {

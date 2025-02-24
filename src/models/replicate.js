@@ -30,7 +30,7 @@ export class ReplicateAPI {
       system_prompt: systemMessage,
       ...this.params,
     };
-    let res = null;
+    let response = null;
     try {
       console.log("Awaiting Replicate API response...");
       let result = "";
@@ -44,13 +44,13 @@ export class ReplicateAPI {
           break;
         }
       }
-      res = result;
+      response = result;
     } catch (error) {
       console.log(error);
-      res = "My brain disconnected, try again.";
+      response = "My brain disconnected, try again.";
     }
     console.log("Received.");
-    return res;
+    return response;
   }
 
   async embed(text) {

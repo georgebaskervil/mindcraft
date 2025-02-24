@@ -26,7 +26,7 @@ export function getNearestFreeSpace(bot, size = 1, distance = 8) {
         let bottom = bot.blockAt(empty_po.offset(x, -1, z));
         if (
           !top ||
-          !top.name == "air" ||
+          top.name !== "air" || // Changed == to !==
           !bottom ||
           bottom.drops.length === 0 ||
           !bottom.diggable
@@ -73,12 +73,14 @@ export function getSurroundingBlocks(bot) {
    * @example
    **/
   // Create a list of block position results that can be unpacked.
-  let res = [];
-  res.push(`Block Below: ${getBlockAtPosition(bot, 0, -1, 0).name}`);
-  res.push(`Block at Legs: ${getBlockAtPosition(bot, 0, 0, 0).name}`);
-  res.push(`Block at Head: ${getBlockAtPosition(bot, 0, 1, 0).name}`);
+  let surroundingBlocks = []; // Renamed from res
+  surroundingBlocks.push(
+    `Block Below: ${getBlockAtPosition(bot, 0, -1, 0).name}`,
+    `Block at Legs: ${getBlockAtPosition(bot, 0, 0, 0).name}`,
+    `Block at Head: ${getBlockAtPosition(bot, 0, 1, 0).name}`,
+  );
 
-  return res;
+  return surroundingBlocks;
 }
 
 export function getFirstBlockAboveHead(
@@ -176,11 +178,11 @@ export function getNearestBlocks(
   }
   blocks.sort((a, b) => a.distance - b.distance);
 
-  let res = [];
+  let results = []; // Renamed from res
   for (const block of blocks) {
-    res.push(block.block);
+    results.push(block.block);
   }
-  return res;
+  return results;
 }
 
 export function getNearestBlock(bot, block_type, distance = 16) {
@@ -210,11 +212,11 @@ export function getNearbyEntities(bot, maxDistance = 16) {
     entities.push({ entity: entity, distance: distance });
   }
   entities.sort((a, b) => a.distance - b.distance);
-  let res = [];
+  let results = []; // Renamed from res
   for (const entity of entities) {
-    res.push(entity.entity);
+    results.push(entity.entity);
   }
-  return res;
+  return results;
 }
 
 export function getNearestEntityWhere(bot, predicate, maxDistance = 16) {
@@ -240,11 +242,11 @@ export function getNearbyPlayers(bot, maxDistance) {
     }
   }
   players.sort((a, b) => a.distance - b.distance);
-  let res = [];
+  let results = []; // Renamed from res
   for (const player of players) {
-    res.push(player.entity);
+    results.push(player.entity);
   }
-  return res;
+  return results;
 }
 
 export function getInventoryStacks(bot) {
@@ -296,14 +298,14 @@ export function getCraftableItems(bot) {
       }
     }
   }
-  let res = [];
+  let craftableItems = []; // Renamed from res
   for (const item of mc.getAllItems()) {
     let recipes = bot.recipesFor(item.id, null, 1, table);
     if (recipes.length > 0) {
-      res.push(item.name);
+      craftableItems.push(item.name);
     }
   }
-  return res;
+  return craftableItems;
 }
 
 export function getPosition(bot) {

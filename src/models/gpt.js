@@ -22,7 +22,7 @@ export class GPT {
   }
 
   async sendRequest(turns, systemMessage, stop_seq = "***") {
-    let messages = [{ role: "system", content: systemMessage }].concat(turns);
+    let messages = [{ role: "system", content: systemMessage }, ...turns];
 
     const pack = {
       model: this.model_name || "gpt-3.5-turbo",
@@ -35,7 +35,7 @@ export class GPT {
       delete pack.stop;
     }
 
-    let res = null;
+    let response = null;
 
     try {
       console.log("Awaiting openai api response from model", this.model_name);
@@ -45,7 +45,7 @@ export class GPT {
         throw new Error("Context length exceeded");
       }
       console.log("Received.");
-      res = completion.choices[0].message.content;
+      response = completion.choices[0].message.content;
     } catch (error) {
       if (
         (error.message == "Context length exceeded" ||
@@ -58,10 +58,10 @@ export class GPT {
         return await this.sendRequest(turns.slice(1), systemMessage, stop_seq);
       } else {
         console.log(error);
-        res = "My brain disconnected, try again.";
+        response = "My brain disconnected, try again.";
       }
     }
-    return res;
+    return response;
   }
 
   async embed(text) {

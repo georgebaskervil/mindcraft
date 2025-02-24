@@ -421,21 +421,21 @@ class ModeController {
 
   getMiniDocs() {
     // no descriptions
-    let res = "Agent Modes:";
+    let result = "Agent Modes:";
     for (let mode of modes_list) {
       let on = mode.on ? "ON" : "OFF";
-      res += `\n- ${mode.name}(${on})`;
+      result += `\n- ${mode.name}(${on})`;
     }
-    return res;
+    return result;
   }
 
   getDocs() {
-    let res = "Agent Modes:";
+    let result = "Agent Modes:";
     for (let mode of modes_list) {
       let on = mode.on ? "ON" : "OFF";
-      res += `\n- ${mode.name}(${on}): ${mode.description}`;
+      result += `\n- ${mode.name}(${on}): ${mode.description}`;
     }
-    return res;
+    return result;
   }
 
   async update() {
@@ -467,11 +467,11 @@ class ModeController {
   }
 
   getJson() {
-    let res = {};
+    let response = {};
     for (let mode of modes_list) {
-      res[mode.name] = mode.on;
+      response[mode.name] = mode.on;
     }
-    return res;
+    return response;
   }
 
   loadJson(json) {

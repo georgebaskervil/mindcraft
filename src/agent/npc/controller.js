@@ -108,13 +108,13 @@ export class NPCController {
         past_goals[goal.name] = true;
       }
     }
-    let res = await this.agent.prompter.promptGoalSetting(
+    let result = await this.agent.prompter.promptGoalSetting(
       this.agent.history.getHistory(),
       past_goals,
     );
-    if (res) {
-      this.data.curr_goal = res;
-      console.log("Set new goal:", res.name, "x", res.quantity);
+    if (result) {
+      this.data.curr_goal = result;
+      console.log("Set new goal:", result.name, "x", result.quantity);
     } else {
       console.log("Error setting new goal.");
     }
@@ -172,7 +172,7 @@ export class NPCController {
 
   async executeGoal() {
     // If we need more blocks to complete a building, get those first
-    let goals = this.temp_goals.concat(this.data.goals);
+    let goals = [...this.temp_goals, ...this.data.goals];
     if (this.data.curr_goal) {
       goals = [...goals, this.data.curr_goal];
     }
@@ -183,8 +183,11 @@ export class NPCController {
       // Obtain goal item or block
       if (this.constructions[goal.name] === undefined) {
         if (!itemSatisfied(this.agent.bot, goal.name, goal.quantity)) {
-          let res = await this.item_goal.executeNext(goal.name, goal.quantity);
-          this.last_goals[goal.name] = res;
+          let response = await this.item_goal.executeNext(
+            goal.name,
+            goal.quantity,
+          );
+          this.last_goals[goal.name] = response;
           acted = true;
           break;
         }
@@ -192,35 +195,36 @@ export class NPCController {
 
       // Build construction goal
       else {
-        let res = null;
-        if (this.data.built.hasOwnProperty(goal.name)) {
-          res = await this.build_goal.executeNext(
+        let buildResult = null;
+        if (Object.hasOwn(this.data.built, goal.name)) {
+          buildResult = await this.build_goal.executeNext(
             this.constructions[goal.name],
             this.data.built[goal.name].position,
             this.data.built[goal.name].orientation,
           );
         } else {
-          res = await this.build_goal.executeNext(
+          buildResult = await this.build_goal.executeNext(
             this.constructions[goal.name],
           );
           this.data.built[goal.name] = {
             name: goal.name,
-            position: res.position,
-            orientation: res.orientation,
+            position: buildResult.position,
+            orientation: buildResult.orientation,
           };
         }
-        if (Object.keys(res.missing).length === 0) {
+        if (Object.keys(buildResult.missing).length === 0) {
           this.data.home = goal.name;
         }
-        for (let block_name in res.missing) {
+        for (let block_name in buildResult.missing) {
           this.temp_goals.push({
             name: block_name,
-            quantity: res.missing[block_name],
+            quantity: buildResult.missing[block_name],
           });
         }
-        if (res.acted) {
+        if (buildResult.acted) {
           acted = true;
-          this.last_goals[goal.name] = Object.keys(res.missing).length === 0;
+          this.last_goals[goal.name] =
+            Object.keys(buildResult.missing).length === 0;
           break;
         }
       }

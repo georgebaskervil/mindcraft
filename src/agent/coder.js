@@ -39,9 +39,10 @@ export class Coder {
     while ((match = skillRegex.exec(code)) !== null) {
       skills.push(match[1]);
     }
-    const allDocs = await this.agent.prompter.skill_library.getAllSkillDocs();
+    const allDocuments =
+      await this.agent.prompter.skill_library.getAllSkillDocs();
     // check function exists
-    const missingSkills = skills.filter((skill) => !!allDocs[skill]);
+    const missingSkills = skills.filter((skill) => !!allDocuments[skill]);
     if (missingSkills.length > 0) {
       result +=
         "These functions do not exist. Please modify the correct function name and try again.\n";
@@ -100,16 +101,10 @@ export class Coder {
     source = this.code_template.replace("/* CODE HERE */", source);
 
     let filename = this.file_counter + ".js";
-    // if (this.file_counter > 0) {
-    //     let prev_filename = this.fp + (this.file_counter-1) + '.js';
-    //     unlink(prev_filename, (err) => {
-    //         console.log("deleted file " + prev_filename);
-    //         if (err) console.error(err);
-    //     });
-    // } commented for now, useful to keep files for debugging
+
     this.file_counter++;
 
-    let write_result = await this.writeFilePromise(
+    let writeResult = await this.writeFilePromise(
       "." + this.fp + filename,
       source,
     );
@@ -124,8 +119,8 @@ export class Coder {
     });
     const mainFunction = compartment.evaluate(source);
 
-    if (write_result) {
-      console.error("Error writing code execution file: " + result);
+    if (writeResult) {
+      console.error("Error writing code execution file: " + writeResult);
       return null;
     }
     return { func: { main: mainFunction }, src_lint_copy: source_lint_copy };
@@ -160,12 +155,12 @@ export class Coder {
     // wrapper to prevent overlapping code generation loops
     await this.agent.actions.stop();
     this.generating = true;
-    let res = await this.generateCodeLoop(agent_history);
+    let result = await this.generateCodeLoop(agent_history);
     this.generating = false;
-    if (!res.interrupted) {
+    if (!result.interrupted) {
       this.agent.bot.emit("idle");
     }
-    return res.message;
+    return result.message;
   }
 
   async generateCodeLoop(agent_history) {
@@ -191,18 +186,21 @@ export class Coder {
       if (this.agent.bot.interrupt_code) {
         return interrupt_return;
       }
-      let res = await this.agent.prompter.promptCoding(
-        JSON.parse(JSON.stringify(messages)),
+      let response = await this.agent.prompter.promptCoding(
+        structuredClone(messages),
       );
       if (this.agent.bot.interrupt_code) {
         return interrupt_return;
       }
-      let contains_code = res.includes("```");
+      let contains_code = response.includes("```");
       if (!contains_code) {
-        if (res.includes("!newAction")) {
+        if (response.includes("!newAction")) {
           messages.push({
             role: "assistant",
-            content: res.slice(0, Math.max(0, res.indexOf("!newAction"))),
+            content: response.slice(
+              0,
+              Math.max(0, response.indexOf("!newAction")),
+            ),
           });
           continue; // using newaction will continue the loop
         }
@@ -223,7 +221,10 @@ export class Coder {
         failures++;
         continue;
       }
-      code = res.substring(res.indexOf("```") + 3, res.lastIndexOf("```"));
+      code = response.slice(
+        response.indexOf("```") + 3,
+        response.lastIndexOf("```"),
+      );
       const result = await this.stageCode(code);
       const executionModuleExports = result.func;
       let source_lint_copy = result.src_lint_copy;
@@ -288,7 +289,7 @@ export class Coder {
       messages.push(
         {
           role: "assistant",
-          content: res,
+          content: response,
         },
         {
           role: "system",

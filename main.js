@@ -29,7 +29,7 @@ function getProfiles(arguments_) {
   return arguments_.profiles || settings.profiles;
 }
 
-async function main() {
+try {
   if (settings.host_mindserver) {
     const mindServer = createMindServer(settings.mindserver_port);
   }
@@ -55,10 +55,6 @@ async function main() {
     );
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
-}
-
-try {
-  main();
 } catch (error) {
   console.error("An error occurred:", error);
   process.exit(1);

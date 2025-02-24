@@ -13,17 +13,17 @@ export class Local {
     let model = this.model_name || "llama3";
     let messages = strictFormat(turns);
     messages.unshift({ role: "system", content: systemMessage });
-    let res = null;
+    let response = null;
     try {
       console.log(`Awaiting local response... (model: ${model})`);
-      res = await this.send(this.chat_endpoint, {
+      response = await this.send(this.chat_endpoint, {
         model: model,
         messages: messages,
         stream: false,
         ...this.params,
       });
-      if (res) {
-        res = res["message"]["content"];
+      if (response) {
+        response = response["message"]["content"];
       }
     } catch (error) {
       if (
@@ -33,20 +33,20 @@ export class Local {
         console.log(
           "Context length exceeded, trying again with shorter context.",
         );
-        return await sendRequest(turns.slice(1), systemMessage, stop_seq);
+        return await this.sendRequest(turns.slice(1), systemMessage);
       } else {
         console.log(error);
-        res = "My brain disconnected, try again.";
+        response = "My brain disconnected, try again.";
       }
     }
-    return res;
+    return response;
   }
 
   async embed(text) {
     let model = this.model_name || "nomic-embed-text";
     let body = { model: model, prompt: text };
-    let res = await this.send(this.embedding_endpoint, body);
-    return res["embedding"];
+    let response = await this.send(this.embedding_endpoint, body);
+    return response["embedding"];
   }
 
   async send(endpoint, body) {
@@ -60,11 +60,11 @@ export class Local {
     });
     let data = null;
     try {
-      const res = await fetch(request);
-      if (res.ok) {
-        data = await res.json();
+      const response = await fetch(request);
+      if (response.ok) {
+        data = await response.json();
       } else {
-        throw new Error(`Ollama Status: ${res.status}`);
+        throw new Error(`Ollama Status: ${response.status}`);
       }
     } catch (error) {
       console.error("Failed to send Ollama request.");

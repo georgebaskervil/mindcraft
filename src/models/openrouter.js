@@ -33,9 +33,10 @@ export class OpenRouter {
       stop: stop_seq,
     };
 
-    let res = null;
+    let responseContent = null;
     try {
       console.log("Awaiting openrouter api response...");
+      const response = await fetch(/* params */);
       let completion = await this.openai.chat.completions.create(pack);
       if (!completion?.choices?.[0]) {
         console.error("No completion or choices returned:", completion);
@@ -45,13 +46,13 @@ export class OpenRouter {
         throw new Error("Context length exceeded");
       }
       console.log("Received.");
-      res = completion.choices[0].message.content;
+      responseContent = completion.choices[0].message.content;
     } catch (error) {
       console.error("Error while awaiting response:", error);
       // If the error indicates a context-length problem, we can slice the turns array, etc.
-      res = "My brain disconnected, try again.";
+      responseContent = "My brain disconnected, try again.";
     }
-    return res;
+    return responseContent;
   }
 
   async embed(text) {

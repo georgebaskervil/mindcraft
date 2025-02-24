@@ -482,13 +482,8 @@ function isBaseItem(item) {
   return loopingItems.has(item) || getItemCraftingRecipes(item) === null;
 }
 
-function craftItem(
-  item,
-  count,
-  inventory,
-  leftovers,
-  crafted = { required: {}, steps: [], leftovers: {} },
-) {
+function craftItem(item, count, inventory, leftovers, crafted) {
+  const craftedValue = crafted ?? { required: {}, steps: [], leftovers: {} };
   // Check available inventory and leftovers first
   const availableInv = inventory[item] || 0;
   const availableLeft = leftovers[item] || 0;
@@ -503,7 +498,7 @@ function craftItem(
     if (remainingNeeded > 0) {
       inventory[item] = availableInv - remainingNeeded;
     }
-    return crafted;
+    return craftedValue;
   }
 
   // Use whatever is available
@@ -516,14 +511,15 @@ function craftItem(
   }
 
   if (isBaseItem(item)) {
-    crafted.required[item] = (crafted.required[item] || 0) + stillNeeded;
-    return crafted;
+    craftedValue.required[item] =
+      (craftedValue.required[item] || 0) + stillNeeded;
+    return craftedValue;
   }
 
   const recipe = getItemCraftingRecipes(item)?.[0];
   if (!recipe) {
-    crafted.required[item] = stillNeeded;
-    return crafted;
+    craftedValue.required[item] = stillNeeded;
+    return craftedValue;
   }
 
   const [ingredients, result] = recipe;
@@ -544,7 +540,7 @@ function craftItem(
       totalIngredientNeeded,
       inventory,
       leftovers,
-      crafted,
+      craftedValue,
     );
   }
 
@@ -552,9 +548,11 @@ function craftItem(
   const stepIngredients = Object.entries(ingredients)
     .map(([name, amount]) => `${amount * batchCount} ${name}`)
     .join(" + ");
-  crafted.steps.push(`Craft ${stepIngredients} -> ${totalProduced} ${item}`);
+  craftedValue.steps.push(
+    `Craft ${stepIngredients} -> ${totalProduced} ${item}`,
+  );
 
-  return crafted;
+  return craftedValue;
 }
 
 function formatPlan({ required, steps, leftovers }) {

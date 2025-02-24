@@ -873,7 +873,7 @@ export async function placeBlock(
   // get the buildoffblock and facevec based on whichever adjacent block is not empty
   let buildOffBlock = null;
   let faceVec = null;
-  const dir_map = {
+  const direction_map = {
     top: Vec3(0, 1, 0),
     bottom: Vec3(0, -1, 0),
     north: Vec3(0, 0, -1),
@@ -884,19 +884,19 @@ export async function placeBlock(
   let directories = [];
   if (placeOn === "side") {
     directories.push(
-      dir_map["north"],
-      dir_map["south"],
-      dir_map["east"],
-      dir_map["west"],
+      direction_map["north"],
+      direction_map["south"],
+      direction_map["east"],
+      direction_map["west"],
     );
-  } else if (dir_map[placeOn] === undefined) {
-    directories.push(dir_map["bottom"]);
+  } else if (direction_map[placeOn] === undefined) {
+    directories.push(direction_map["bottom"]);
     log(bot, `Unknown placeOn value "${placeOn}". Defaulting to bottom.`);
   } else {
-    directories.push(dir_map[placeOn]);
+    directories.push(direction_map[placeOn]);
   }
   directories.push(
-    ...Object.values(dir_map).filter((d) => !directories.includes(d)),
+    ...Object.values(direction_map).filter((d) => !directories.includes(d)),
   );
 
   for (let d of directories) {
