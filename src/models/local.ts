@@ -1,4 +1,4 @@
-import { strictFormat } from "../utils/text.js";
+import { strictFormat } from "../utils/text";
 
 export class Local {
   constructor(model_name, url, parameters) {

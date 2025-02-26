@@ -1,8 +1,8 @@
 import { writeFile, readFile, mkdirSync } from "node:fs";
-import settings from "../../settings.js";
-import { makeCompartment } from "./library/lockdown.js";
-import * as skills from "./library/skills.js";
-import * as world from "./library/world.js";
+import settings from "../../settings";
+import { makeCompartment } from "./library/lockdown";
+import * as skills from "./library/skills";
+import * as world from "./library/world";
 import { Vec3 } from "vec3";
 import { ESLint } from "eslint";
 

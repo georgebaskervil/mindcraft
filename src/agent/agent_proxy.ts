@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
-import convoManager from "./conversation.js";
-import settings from "../../settings.js";
+import convoManager from "./conversation";
+import settings from "../../settings";
 
 class AgentServerProxy {
   constructor() {

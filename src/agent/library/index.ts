@@ -1,5 +1,5 @@
-import * as skills from "./skills.js";
-import * as world from "./world.js";
+import * as skills from "./skills";
+import * as world from "./world";
 
 export function documentHelper(functions, module_name) {
   const documentArray = [];

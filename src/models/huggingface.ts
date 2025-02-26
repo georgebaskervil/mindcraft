@@ -1,5 +1,5 @@
-import { toSinglePrompt } from "../utils/text.js";
-import { getKey } from "../utils/keys.js";
+import { toSinglePrompt } from "../utils/text";
+import { getKey } from "../utils/keys";
 import { HfInference } from "@huggingface/inference";
 
 export class HuggingFace {

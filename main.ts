@@ -1,9 +1,9 @@
-import { AgentProcess } from "./src/process/agent_process.js";
-import settings from "./settings.js";
+import { AgentProcess } from "./src/process/agent_process";
+import settings from "./settings";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { createMindServer } from "./src/server/mind_server.js";
-import { mainProxy } from "./src/process/main_proxy.js";
+import { createMindServer } from "./src/server/mind_server";
+import { mainProxy } from "./src/process/main_proxy";
 import { readFileSync } from "node:fs";
 
 function parseArguments() {

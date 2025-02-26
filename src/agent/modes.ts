@@ -1,8 +1,8 @@
-import * as skills from "./library/skills.js";
-import * as world from "./library/world.js";
-import * as mc from "../utils/mcdata.js";
-import settings from "../../settings.js";
-import convoManager from "./conversation.js";
+import * as skills from "./library/skills";
+import * as world from "./library/world";
+import * as mc from "../utils/mcdata";
+import settings from "../../settings";
+import convoManager from "./conversation";
 
 async function say(agent, message) {
   agent.bot.modes.behavior_log += message + "\n";

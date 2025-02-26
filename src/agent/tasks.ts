@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
-import { executeCommand } from "./commands/index.js";
-import { getPosition } from "./library/world.js";
-import settings from "../../settings.js";
+import { executeCommand } from "./commands/index";
+import { getPosition } from "./library/world";
+import settings from "../../settings";
 
 // Helper function moved to module scope
 function getRandomOffset(range) {

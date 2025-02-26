@@ -1,8 +1,8 @@
-import { History } from "./history.js";
-import { Coder } from "./coder.js";
-import { Prompter } from "../models/prompter.js";
-import { initModes } from "./modes.js";
-import { initBot } from "../utils/mcdata.js";
+import { History } from "./history";
+import { Coder } from "./coder";
+import { Prompter } from "../models/prompter";
+import { initModes } from "./modes";
+import { initBot } from "../utils/mcdata";
 import {
   containsCommand,
   commandExists,
@@ -10,20 +10,20 @@ import {
   truncCommandMessage,
   isAction,
   blacklistCommands,
-} from "./commands/index.js";
-import { ActionManager } from "./action_manager.js";
-import { NPCController } from "./npc/controller.js";
-import { MemoryBank } from "./memory_bank.js";
-import { SelfPrompter } from "./self_prompter.js";
-import convoManager from "./conversation.js";
+} from "./commands/index";
+import { ActionManager } from "./action_manager";
+import { NPCController } from "./npc/controller";
+import { MemoryBank } from "./memory_bank";
+import { SelfPrompter } from "./self_prompter";
+import convoManager from "./conversation";
 import {
   handleTranslation,
   handleEnglishTranslation,
-} from "../utils/translator.js";
-import { addViewer } from "./viewer.js";
-import settings from "../../settings.js";
-import { serverProxy } from "./agent_proxy.js";
-import { Task } from "./tasks.js";
+} from "../utils/translator";
+import { addViewer } from "./viewer";
+import settings from "../../settings";
+import { serverProxy } from "./agent_proxy";
+import { Task } from "./tasks";
 
 export class Agent {
   async start(

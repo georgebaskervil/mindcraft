@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import settings from "../../settings.js";
+import settings from "../../settings";
 
 // Singleton mindserver proxy for the main process
 class MainProxy {

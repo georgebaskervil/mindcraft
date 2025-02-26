@@ -1,5 +1,5 @@
 import Groq from "groq-sdk";
-import { getKey } from "../utils/keys.js";
+import { getKey } from "../utils/keys";
 
 // Umbrella class for Mixtral, LLama, Gemma...
 export class GroqCloudAPI {

@@ -1,5 +1,5 @@
-import * as mc from "../../utils/mcdata.js";
-import * as world from "./world.js";
+import * as mc from "../../utils/mcdata";
+import * as world from "./world";
 import pf from "mineflayer-pathfinder";
 import Vec3 from "vec3";
 

@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { strictFormat } from "../utils/text.js";
-import { getKey } from "../utils/keys.js";
+import { strictFormat } from "../utils/text";
+import { getKey } from "../utils/keys";
 
 export class Claude {
   constructor(model_name, url, parameters) {

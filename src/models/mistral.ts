@@ -1,6 +1,6 @@
 import { Mistral as MistralClient } from "@mistralai/mistralai";
-import { getKey } from "../utils/keys.js";
-import { strictFormat } from "../utils/text.js";
+import { getKey } from "../utils/keys";
+import { strictFormat } from "../utils/text";
 
 export class Mistral {
   #client;

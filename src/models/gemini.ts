@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { toSinglePrompt, strictFormat } from "../utils/text.js";
-import { getKey } from "../utils/keys.js";
+import { toSinglePrompt, strictFormat } from "../utils/text";
+import { getKey } from "../utils/keys";
 
 export class Gemini {
   constructor(model_name, url, parameters) {

@@ -1,11 +1,11 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { NPCData } from "./data.js";
-import { ItemGoal } from "./item_goal.js";
-import { BuildGoal } from "./build_goal.js";
-import { itemSatisfied, rotateXZ } from "./utils.js";
-import * as skills from "../library/skills.js";
-import * as world from "../library/world.js";
-import * as mc from "../../utils/mcdata.js";
+import { NPCData } from "./data";
+import { ItemGoal } from "./item_goal";
+import { BuildGoal } from "./build_goal";
+import { itemSatisfied, rotateXZ } from "./utils";
+import * as skills from "../library/skills";
+import * as world from "../library/world";
+import * as mc from "../../utils/mcdata";
 
 export class NPCController {
   constructor(agent) {

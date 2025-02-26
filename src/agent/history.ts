@@ -1,6 +1,6 @@
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from "node:fs";
-import { NPCData } from "./npc/data.js";
-import settings from "../../settings.js";
+import { NPCData } from "./npc/data";
+import settings from "../../settings";
 
 export class History {
   constructor(agent) {

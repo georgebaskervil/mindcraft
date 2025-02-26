@@ -1,25 +1,25 @@
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
-import { Examples } from "../utils/examples.js";
-import { getCommandDocumentation } from "../agent/commands/index.js";
-import { getSkillDocumentation } from "../agent/library/index.js";
-import { SkillLibrary } from "../agent/library/skill_library.js";
-import { stringifyTurns } from "../utils/text.js";
-import { getCommand } from "../agent/commands/index.js";
-import settings from "../../settings.js";
+import { Examples } from "../utils/examples";
+import { getCommandDocumentation } from "../agent/commands/index";
+import { getSkillDocumentation } from "../agent/library/index";
+import { SkillLibrary } from "../agent/library/skill_library";
+import { stringifyTurns } from "../utils/text";
+import { getCommand } from "../agent/commands/index";
+import settings from "../../settings";
 
-import { Gemini } from "./gemini.js";
-import { GPT } from "./gpt.js";
-import { Claude } from "./claude.js";
-import { Mistral } from "./mistral.js";
-import { ReplicateAPI } from "./replicate.js";
-import { Local } from "./local.js";
-import { Novita } from "./novita.js";
-import { GroqCloudAPI } from "./groq.js";
-import { HuggingFace } from "./huggingface.js";
-import { Qwen } from "./qwen.js";
-import { Grok } from "./grok.js";
-import { DeepSeek } from "./deepseek.js";
-import { OpenRouter } from "./openrouter.js";
+import { Gemini } from "./gemini";
+import { GPT } from "./gpt";
+import { Claude } from "./claude";
+import { Mistral } from "./mistral";
+import { ReplicateAPI } from "./replicate";
+import { Local } from "./local";
+import { Novita } from "./novita";
+import { GroqCloudAPI } from "./groq";
+import { HuggingFace } from "./huggingface";
+import { Qwen } from "./qwen";
+import { Grok } from "./grok";
+import { DeepSeek } from "./deepseek";
+import { OpenRouter } from "./openrouter";
 
 export class Prompter {
   constructor(agent, fp) {

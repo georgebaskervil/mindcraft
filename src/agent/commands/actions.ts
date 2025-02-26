@@ -1,6 +1,6 @@
-import * as skills from "../library/skills.js";
-import settings from "../../../settings.js";
-import convoManager from "../conversation.js";
+import * as skills from "../library/skills";
+import settings from "../../../settings";
+import convoManager from "../conversation";
 
 function runAsAction(actionFunction, resume = false, timeout = -1) {
   let actionLabel = null; // Will be set on first use

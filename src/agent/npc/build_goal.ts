@@ -1,8 +1,8 @@
 import { Vec3 } from "vec3";
-import * as skills from "../library/skills.js";
-import * as world from "../library/world.js";
-import * as mc from "../../utils/mcdata.js";
-import { blockSatisfied, getTypeOfGeneric, rotateXZ } from "./utils.js";
+import * as skills from "../library/skills";
+import * as world from "../library/world";
+import * as mc from "../../utils/mcdata";
+import { blockSatisfied, getTypeOfGeneric, rotateXZ } from "./utils";
 
 export class BuildGoal {
   constructor(agent) {

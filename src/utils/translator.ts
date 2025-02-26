@@ -1,5 +1,5 @@
 import translate from "google-translate-api-x";
-import settings from "../../settings.js";
+import settings from "../../settings";
 
 const preferred_lang = String(settings.language).toLowerCase();
 

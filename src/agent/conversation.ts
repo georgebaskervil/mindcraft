@@ -1,7 +1,7 @@
-import settings from "../../settings.js";
+import settings from "../../settings";
 import { readFileSync } from "node:fs";
-import { containsCommand } from "./commands/index.js";
-import { sendBotChatToServer } from "./agent_proxy.js";
+import { containsCommand } from "./commands/index";
+import { sendBotChatToServer } from "./agent_proxy";
 
 let agent;
 let agent_names = settings.profiles.map(

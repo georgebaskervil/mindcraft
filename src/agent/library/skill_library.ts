@@ -1,6 +1,6 @@
-import { cosineSimilarity } from "../../utils/math.js";
-import { getSkillDocumentation } from "./index.js";
-import { wordOverlapScore } from "../../utils/text.js";
+import { cosineSimilarity } from "../../utils/math";
+import { getSkillDocumentation } from "./index";
+import { wordOverlapScore } from "../../utils/text";
 
 export class SkillLibrary {
   constructor(agent, embedding_model) {

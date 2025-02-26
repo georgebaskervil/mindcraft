@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { mainProxy } from "./main_proxy.js";
+import { mainProxy } from "./main_proxy";
 
 export class AgentProcess {
   start(

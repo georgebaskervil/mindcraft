@@ -1,5 +1,5 @@
-import { cosineSimilarity } from "./math.js";
-import { stringifyTurns, wordOverlapScore } from "./text.js";
+import { cosineSimilarity } from "./math";
+import { stringifyTurns, wordOverlapScore } from "./text";
 
 export class Examples {
   constructor(model, select_number = 2) {

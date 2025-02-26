@@ -1,7 +1,7 @@
-import * as world from "../library/world.js";
-import * as mc from "../../utils/mcdata.js";
-import { getCommandDocumentation } from "./index.js";
-import convoManager from "../conversation.js";
+import * as world from "../library/world";
+import * as mc from "../../utils/mcdata";
+import { getCommandDocumentation } from "./index";
+import convoManager from "../conversation";
 
 const pad = (string_) => {
   return "\n" + string_ + "\n";

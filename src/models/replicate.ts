@@ -1,6 +1,6 @@
 import Replicate from "replicate";
-import { toSinglePrompt } from "../utils/text.js";
-import { getKey } from "../utils/keys.js";
+import { toSinglePrompt } from "../utils/text";
+import { getKey } from "../utils/keys";
 
 // llama, mistral
 export class ReplicateAPI {

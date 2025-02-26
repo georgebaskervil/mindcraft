@@ -1,6 +1,6 @@
 import OpenAIApi from "openai";
-import { getKey } from "../utils/keys.js";
-import { strictFormat } from "../utils/text.js";
+import { getKey } from "../utils/keys";
+import { strictFormat } from "../utils/text";
 
 // llama, mistral
 export class Novita {

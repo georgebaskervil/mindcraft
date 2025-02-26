@@ -1,6 +1,6 @@
-import { getBlockId, getItemId } from "../../utils/mcdata.js";
-import { actionsList } from "./actions.js";
-import { queryList } from "./queries.js";
+import { getBlockId, getItemId } from "../../utils/mcdata";
+import { actionsList } from "./actions";
+import { queryList } from "./queries";
 
 let suppressNoDomainWarning = false;
 

@@ -1,5 +1,5 @@
 import OpenAIApi from "openai";
-import { getKey } from "../utils/keys.js";
+import { getKey } from "../utils/keys";
 
 // xAI doesn't supply a SDK for their models, but fully supports OpenAI and Anthropic SDKs
 export class Grok {
